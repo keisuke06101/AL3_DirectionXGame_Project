@@ -4,16 +4,37 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete sprite_;
+	delete model_;
+	//自キャラの解放
+	delete player_;
+}
 
 void GameScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	textureHandle_ = TextureManager::Load("sample.png");
+
+	sprite_ = Sprite::Create(textureHandle_, {100, 50});
+	model_ = Model::Create();
+
+	worldTransform_.Initialize();
+	viewProjection_.Initialize();
+
+	//自キャラの生成
+	player_ = new Player();
+	//自キャラの初期化
+	player_->Initialize();
 }
 
-void GameScene::Update() {}
+void GameScene::Update() { 
+	//自キャラの更新
+	player_->Update();
+}
 
 void GameScene::Draw() {
 
@@ -41,7 +62,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -54,8 +75,12 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
+	sprite_->Draw();
+
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
+	//自キャラの描画
+	player_->Draw();
 #pragma endregion
 }
