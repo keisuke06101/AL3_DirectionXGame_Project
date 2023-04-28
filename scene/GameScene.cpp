@@ -4,7 +4,9 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { 
+GameScene::~GameScene()
+{
+	delete debugCamera_;
 	delete model_;
 	delete player_;
 }
@@ -14,26 +16,40 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-
-	//ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("sample.png");
-
-	// モデルの生成
 	model_ = Model::Create();
-
-	//ビュープロジェクションの初期化
+	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	player_ = new Player;
 	viewProjection_.Initialize();
-
-	//自キャラの生成
-	player_ = new Player();
-	//自キャラの初期化
 	player_->Initialize(model_, textureHandle_);
+
 }
 
 void GameScene::Update() 
 {
-	//自キャラの更新
+
+    #ifdef _DEBUG
+    	if (input_->TriggerKey(DIK_BACKSPACE)) {
+    		isDebugCameraActive_ = true;
+    	}
+    #endif // DEBUG 
 	player_->Update();
+
+	if (isDebugCameraActive_)
+	{
+		// デバックカメラの更新
+		debugCamera_->Update();
+
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		//ビュープロジェクション行列の転送
+		viewProjection_.TransferMatrix();
+	} else
+	{
+		//ビュープロジェクション行列の更新と転送
+		viewProjection_.UpdateMatrix();
+	}
+
 }
 
 void GameScene::Draw() {
