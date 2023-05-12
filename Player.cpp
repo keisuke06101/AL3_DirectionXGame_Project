@@ -81,12 +81,75 @@ void Player::Update() {
 	ImGui::SliderFloat3("position", sliderValue, -20.0f, 20.0f);
 	worldTransform_.translation_ = {sliderValue[0], sliderValue[1], sliderValue[2]};
 	ImGui::End();
+	 
+	//回転　
+	const float kRotSpeed = 0.02f;
+
+	//押した方向で移動ベクトルを変更
+	if (input_->PushKey(DIK_A))
+	{
+		worldTransform_.rotation_.y -= kRotSpeed;
+	}
+	else if (input_->PushKey(DIK_A))
+	{
+		worldTransform_.rotation_.y += kRotSpeed;
+	}
+
+	//キャラクターの攻撃処理
+	Attack();
+
+	// キャラクターの旋回
+	Rotate();
+
+	//弾更新
+	if (bullet_)
+	{
+		bullet_->Update();
+	}
+
 
 }
+
+void Player::Attack()
+{ 
+	if (input_->TriggerKey(DIK_SPACE))
+	{
+		//弾を生成し、初期化
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_);
+
+		//弾を登録する
+		bullet_ = newBullet;
+	}
+}
+
+void Player::Rotate()
+{ 
+	const float kRotSpeed = 0.02f;
+
+	if (input_->PushKey(DIK_A))
+	{
+		worldTransform_.rotation_.y -= kRotSpeed;
+	}
+
+	if (input_->PushKey(DIK_D)) {
+		worldTransform_.rotation_.y += kRotSpeed;
+	}
+
+}
+
 /// <summary>
 /// 描画
 /// </summary>
 void Player::Draw(ViewProjection& viewProjection)
  {
+	//自キャラの描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
- }
+
+	//弾描画
+	if (bullet_)
+	{
+		bullet_->Draw(viewProjection);
+	}
+}
+

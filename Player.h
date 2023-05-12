@@ -2,6 +2,7 @@
 #include "WorldTransform.h"
 #include "Input.h"
 #include "ImGuiManager.h"
+#include "PlayerBullet.h"
 #include <cassert>
 #pragma once
 
@@ -27,6 +28,16 @@ public:
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
 
+	/// <summary>
+	/// 攻撃
+	/// </summary>
+	void Attack();
+
+	/// <summary>
+	/// 旋回
+	/// </summary>
+	void Rotate();
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -39,4 +50,7 @@ private:
 
 	//キーボード入力
 	Input* input_ = nullptr;
+
+	// 弾
+	PlayerBullet* bullet_ = nullptr;
 };

@@ -97,8 +97,8 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vecto
 
 	//回転行列
 	Matrix4x4 matRotX = MakeRotX(rot.x);
-	Matrix4x4 matRotY = MakeRotX(rot.y); 
-	Matrix4x4 matRotZ = MakeRotX(rot.z);
+	Matrix4x4 matRotY = MakeRotY(rot.y); 
+	Matrix4x4 matRotZ = MakeRotZ(rot.z);
 	//合成（Z * X * Y）
 	Matrix4x4 matRot = matRotZ * matRotX * matRotY;
 
