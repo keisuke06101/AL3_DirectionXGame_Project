@@ -1,6 +1,5 @@
 ﻿#include "Player.h"
 
-
 /// <summary>
 /// 初期化
 /// </summary>
