@@ -16,6 +16,9 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle)
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
+
+	//位置の初期化
+	worldTransform_.translation_ = {0, 0, 50};
 }
 
 /// <summary>
@@ -23,16 +26,11 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle)
 /// </summary>
 void Enemy::Update()
 {
-	// 敵の移動ベクトル
-	Vector3 move = {0, 0, 50};
-
 	// 敵の移動速さ
 	const float kCharcterSpeed = 0.2f;
 
-	move.z = kCharcterSpeed;
-
 	// 座標移動（ベクトルの加算）
-	worldTransform_.translation_.z -= move.z;
+	worldTransform_.translation_.z -= kCharcterSpeed;
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
@@ -70,7 +68,7 @@ void Enemy::phaseApproach()
 	worldTransform_.translation_.x -= kApproachSpeed;
 	worldTransform_.translation_.y += kApproachSpeed;
 	// 既定の位置に到達したら離脱
-	if (worldTransform_.translation_.z > 0.0f) {
+	if (worldTransform_.translation_.z < 0.0f) {
 		phase_ = Phase::Leave;
 	}
 }
