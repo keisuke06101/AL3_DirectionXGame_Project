@@ -25,6 +25,16 @@ public:
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
 
+	/// <summary>
+	/// 接近フェーズの更新処理
+	/// </summary>
+	void phaseApproach();
+
+	/// <summary>
+	/// 離脱フェーズの更新処理
+	/// </summary>
+	void phaseLeave();
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -34,5 +44,13 @@ private:
 
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+
+	// 行動フェーズ
+	enum class Phase { 
+		Approach,  //接近する
+		Leave      //離脱する
+	};
+
+	Phase phase_ = phase_;
 
 };

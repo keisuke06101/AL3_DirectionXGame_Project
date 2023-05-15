@@ -24,23 +24,32 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle)
 void Enemy::Update()
 {
 	// 敵の移動ベクトル
-	Vector3 move = {0, 0, 0};
+	Vector3 move = {0, 0, 50};
 
 	// 敵の移動速さ
 	const float kCharcterSpeed = 0.2f;
 
-	move.z -= kCharcterSpeed;
+	move.z = kCharcterSpeed;
 
 	// 座標移動（ベクトルの加算）
-	worldTransform_.translation_.x += move.x;
-	worldTransform_.translation_.y += move.y;
-	worldTransform_.translation_.z += move.z;
+	worldTransform_.translation_.z -= move.z;
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
 	// 行列を定数バッファーに転送
 	worldTransform_.TransferMatrix();
+
+	switch (phase_) { 
+	case Phase::Approach:
+	default:
+		phaseApproach();
+		break;
+
+	case Phase::Leave:
+		phaseLeave();
+		break;
+	}
 }
 
 /// <summary>
@@ -51,4 +60,26 @@ void Enemy::Draw(ViewProjection& viewProjection)
 {
 	// 敵の描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+}
+
+void Enemy::phaseApproach()
+{
+	// 接近フェーズスピード
+	const float kApproachSpeed = 0.2f;
+	// 移動ベクトル
+	worldTransform_.translation_.x -= kApproachSpeed;
+	worldTransform_.translation_.y += kApproachSpeed;
+	// 既定の位置に到達したら離脱
+	if (worldTransform_.translation_.z > 0.0f) {
+		phase_ = Phase::Leave;
+	}
+}
+
+void Enemy::phaseLeave()
+{
+	// 離脱フェーズスピード
+	const float kLeaveSpeed = 0.2f;
+	// 移動ベクトル
+	worldTransform_.translation_.x += kLeaveSpeed;
+	worldTransform_.translation_.y -= kLeaveSpeed;
 }
