@@ -71,8 +71,7 @@ void Enemy::phaseLeave()
 	// 離脱フェーズスピード
 	const float kLeaveSpeed = 0.2f;
 	// 移動ベクトル
-	worldTransform_.translation_.z -= kLeaveSpeed;
-	// 移動ベクトル
 	worldTransform_.translation_.x -= kLeaveSpeed;
 	worldTransform_.translation_.y += kLeaveSpeed;
+	worldTransform_.translation_.z -= kLeaveSpeed;
 }
