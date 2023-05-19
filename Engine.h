@@ -28,23 +28,23 @@ public:
 class EngineIdle : public EngineState
 {
 public:
-	virtual void up(Engine* pEngine) = 0;
-	virtual void down(Engine* pEngine) = 0;
-	virtual void showState() = 0;
+	void up(Engine* pEngine);
+	void down(Engine* pEngine);
+	void showState();
 };
 
 // EngineLowクラス
 class EngineLow : public EngineState {
 public:
-	virtual void up(Engine* pEngine) = 0;
-	virtual void down(Engine* pEngine) = 0;
-	virtual void showState() = 0;
+	void up(Engine* pEngine);
+	void down(Engine* pEngine);
+	void showState();
 };
 
 // EngineHighクラス
 class EngineHigh : public EngineState {
 public:
-	virtual void up(Engine* pEngine) = 0;
-	virtual void down(Engine* pEngine) = 0;
-	virtual void showState() = 0;
+	void up(Engine* pEngine);
+	void down(Engine* pEngine);
+	void showState();
 };
