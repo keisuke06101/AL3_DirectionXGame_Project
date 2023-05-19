@@ -51,6 +51,6 @@ private:
 		Leave      //離脱する
 	};
 
-	Phase phase_ = phase_;
+	Phase phase_ = Phase::Approach;
 
 };
