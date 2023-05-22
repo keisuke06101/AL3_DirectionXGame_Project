@@ -3,7 +3,7 @@
 #include "Input.h"
 #include "ImGuiManager.h"
 #include "PlayerBullet.h"
-#include "MarhUtility.h"
+#include "MathUtility.h"
 #include <cassert>
 #include <list>
 #pragma once

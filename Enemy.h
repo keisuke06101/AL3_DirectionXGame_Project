@@ -1,6 +1,8 @@
 ﻿#include "Model.h"
 #include "WorldTransform.h"
 #include "ImGuiManager.h"
+#include "EnemyBullet.h"
+#include "MathUtility.h"
 #include <cassert>
 #include <list>
 
@@ -26,6 +28,11 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 	/// <summary>
+	/// 接近フェーズの初期化
+	/// </summary>
+	void phaseApproachInitialize();
+
+	/// <summary>
 	/// 接近フェーズの更新処理
 	/// </summary>
 	void phaseApproach();
@@ -34,6 +41,16 @@ public:
 	/// 離脱フェーズの更新処理
 	/// </summary>
 	void phaseLeave();
+
+	/// <summary>
+	/// 弾発射
+	/// </summary>
+	void Fire();
+
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Enemy();
 
 private:
 	// ワールド変換データ
@@ -53,4 +70,13 @@ private:
 
 	Phase phase_ = Phase::Approach;
 
+	// 弾
+	std::list<EnemyBullet*> bullets_;
+
+	// 発射タイマー
+	int32_t fireTimer = 0;
+
+public:
+	// 発射間隔
+	static const int kFireInterval = 60;
 };
