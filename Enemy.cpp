@@ -1,4 +1,5 @@
 ﻿#include "Enemy.h"
+#include "Player.h"
 
 /// <summary>
 /// 初期化
@@ -30,6 +31,17 @@ Enemy::~Enemy()
 	for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
 	}
+}
+
+Vector3 Enemy::GetWorldPosition() 
+{
+	// ワールド座標を入れる変数
+	Vector3 worldPos;
+	// ワールド行列の平行移動成分を取得（ワールド座標）
+	worldPos.x = worldTransform_.translation_.x;
+	worldPos.y = worldTransform_.translation_.y;
+	worldPos.z = worldTransform_.translation_.z;
+	return worldPos;
 }
 
 /// <summary>
@@ -124,9 +136,24 @@ void Enemy::phaseLeave()
 
 void Enemy::Fire()
 {
+	assert(player_);
+
 	// 弾の速度
 	const float kBulletSpeed = 1.0f;
-	Vector3 velocity(0, 0, kBulletSpeed);
+
+	// 自キャラのワールド座標を取得する
+	player_->GetWorldPosition();
+	// 敵キャラのワールド座標を取得する
+	GetWorldPosition();
+	// 敵キャラ->自キャラの差分ベクトル
+	Vector3 vec{
+	    player_->GetWorldPosition().x - GetWorldPosition().x,
+	    player_->GetWorldPosition().y - GetWorldPosition().y,
+	    player_->GetWorldPosition().z - GetWorldPosition().z
+	};
+	float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
+	Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
 	
 	// 弾を生成し、初期化
 	EnemyBullet* newBullet = new EnemyBullet();

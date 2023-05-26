@@ -27,6 +27,9 @@ void GameScene::Initialize() {
 	player_->Initialize(model_, textureHandle_);
 	enemy_->Initialize(model_, enemyTextureHandle_);
 
+	// 敵キャラに自キャラのアドレスを渡す
+	enemy_->SetPlayer(player_);
+
 }
 
 void GameScene::Update() 

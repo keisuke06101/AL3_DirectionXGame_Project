@@ -4,9 +4,13 @@
 #include "EnemyBullet.h"
 #include "MathUtility.h"
 #include <cassert>
+#include <cmath>
 #include <list>
 
 #pragma once
+// 自機クラスの前方宣言
+class Player;
+
 class Enemy 
 {
 public:
@@ -52,6 +56,14 @@ public:
 	/// </summary>
 	~Enemy();
 
+	// 発射間隔
+	static const int kFireInterval = 60;
+
+	void SetPlayer(Player* player) { player_ = player; }
+
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -76,7 +88,7 @@ private:
 	// 発射タイマー
 	int32_t fireTimer = 0;
 
-public:
-	// 発射間隔
-	static const int kFireInterval = 60;
+	// 自キャラ
+	Player* player_ = nullptr;
+
 };
