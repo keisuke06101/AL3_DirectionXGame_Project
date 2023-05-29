@@ -175,6 +175,8 @@ Vector3 Player::GetWorldPosition()
 	return worldPos;
 }
 
+void Player::Oncollision() {}
+
 /// <summary>
 /// 描画
 /// </summary>

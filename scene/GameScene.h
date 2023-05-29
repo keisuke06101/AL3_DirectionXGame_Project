@@ -43,6 +43,11 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// 衝突判定と応答
+	/// </summary>
+	void CheckAllCollisions();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -71,4 +76,10 @@ private: // メンバ変数
 
 	//敵
 	Enemy* enemy_ = nullptr;
+
+	// プレイヤーの弾
+	PlayerBullet* playerBullet_ = nullptr;
+
+	//　敵の弾
+	EnemyBullet* enemyBullet_ = nullptr;
 };

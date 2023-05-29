@@ -44,6 +44,8 @@ Vector3 Enemy::GetWorldPosition()
 	return worldPos;
 }
 
+void Enemy::Oncollision() {}
+
 /// <summary>
 /// 更新
 /// </summary>
