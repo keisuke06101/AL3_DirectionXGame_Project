@@ -10,6 +10,7 @@
 #include "WorldTransform.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Skydome.h"
 #include "DebugCamera.h"
 
 /// <summary>
@@ -82,4 +83,9 @@ private: // メンバ変数
 
 	//　敵の弾
 	EnemyBullet* enemyBullet_ = nullptr;
+
+	// 天球
+	Skydome* skydome_ = nullptr;
+	// 3Dモデル
+	Model* modelSkydome_ = nullptr;
 };
