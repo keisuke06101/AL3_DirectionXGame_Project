@@ -6,6 +6,7 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	assert(model);
 
 	model_ = model;
+	velocity_ = velocity;
 	//テクスチャ読み込み
 	textureHandle_ = TextureManager::Load("white1x1.png");
 
@@ -13,14 +14,12 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 
 	//引数で受け取った初期座標をセット
 	worldTransform_.translation_ = position;
-	velocity_ = velocity;
 }
 
 void PlayerBullet::Update() 
 {
 	//ワールドトランスフォームの更新
-	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_,worldTransform_.rotation_,worldTransform_.translation_);
-	worldTransform_.TransferMatrix();
+	//worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_,worldTransform_.rotation_,worldTransform_.translation_);
 
 	//座標を移動させる（１フレーム分の移動量を足しこむ）
 	worldTransform_.translation_.x += velocity_.x;
@@ -32,6 +31,7 @@ void PlayerBullet::Update()
 	{
 		isDead_ = true;
 	}
+	worldTransform_.UpdateMatrix();
 }
 
 void PlayerBullet::Draw(const ViewProjection& viewProjection)

@@ -2,6 +2,7 @@
 #include "Vector3.h"
 #define USE_MATH_DEFINES
 #include <math.h>
+#include <assert.h>
 
 /// <summary>
 /// 4x4行列
@@ -34,3 +35,7 @@ Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2);
 
 //アフィン変換行列
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate);
+
+// 逆行列
+Matrix4x4 Inverse(const Matrix4x4& m);
+

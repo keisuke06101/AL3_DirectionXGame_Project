@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Skydome.h"
+#include "RailCamera.h"
 #include "DebugCamera.h"
 
 /// <summary>
@@ -63,6 +64,9 @@ private: // メンバ変数
 
 	Model* model_ = nullptr;
 
+	// ワールド変換データ
+	WorldTransform worldTransform_;
+
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
 	
@@ -86,6 +90,14 @@ private: // メンバ変数
 
 	// 天球
 	Skydome* skydome_ = nullptr;
+
+	// レールカメラ
+	RailCamera* railCamera_ = nullptr;
+
+	Vector3 trans_{};
+	Vector3 rot_{};
 	// 3Dモデル
 	Model* modelSkydome_ = nullptr;
+
+
 };
