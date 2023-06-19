@@ -1,24 +1,25 @@
 ﻿#include "Enemy.h"
 #include "Player.h"
+#include "GameScene.h"
 
 /// <summary>
 /// 初期化
 /// </summary>
 /// <param name="model"></param>
 /// <param name="textureHandle"></param>
-void Enemy::Initialize(Model* model, uint32_t textureHandle) {
+void Enemy::Initialize(Model* model, const Vector3& pos) {
 	// NULLポイントチェック
 	assert(model);
 
 	// 受け渡し
 	model_ = model;
-	textureHandle_ = textureHandle;
+	textureHandle_ = TextureManager::Load("nu.png");
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
 
 	// 位置の初期化
-	worldTransform_.translation_ = {0, 0, 50};
+	worldTransform_.translation_ = pos;
 
 	// 接近フェーズの初期化
 	phaseApproachInitialize();
@@ -28,9 +29,9 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle) {
 
 Enemy::~Enemy() 
 {
-	for (EnemyBullet* bullet : bullets_) {
+	/*for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
-	}
+	}*/
 }
 
 Vector3 Enemy::GetWorldPosition() 
@@ -52,13 +53,13 @@ void Enemy::Oncollision() {}
 void Enemy::Update()
 {
 	// デスフラグの立った弾を削除
-	bullets_.remove_if([](EnemyBullet* bullet) {
+	/*bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->IsDead()) {
 			delete bullet;
 			return true;
 		}
 		return false;
-	});
+	});*/
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
@@ -78,9 +79,9 @@ void Enemy::Update()
 	}
 
 	// 弾更新
-	for (EnemyBullet* bullet : bullets_) {
+	/*for (EnemyBullet* bullet : bullets_) {
 		bullet->Update();
-	}
+	}*/
 }
 
 /// <summary>
@@ -93,9 +94,9 @@ void Enemy::Draw(ViewProjection& viewProjection)
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
 	// 弾描画
-	for (EnemyBullet* bullet : bullets_) {
+	/*for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
-	}
+	}*/
 }
 
 void Enemy::phaseApproachInitialize() 
@@ -134,6 +135,10 @@ void Enemy::phaseLeave()
 	worldTransform_.translation_.x += kLeaveSpeed;
 	//worldTransform_.translation_.y += kLeaveSpeed;
 	//worldTransform_.translation_.z -= kLeaveSpeed;
+	// 時間経過で消える
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
 }
 
 void Enemy::Fire()
@@ -162,6 +167,6 @@ void Enemy::Fire()
 	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
 	// 弾を登録する
-	bullets_.push_back(newBullet);
+	gameScene_->AddEnemyBullet(newBullet);
 }
 

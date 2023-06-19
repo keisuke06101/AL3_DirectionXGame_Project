@@ -10,6 +10,8 @@
 #pragma once
 // 自機クラスの前方宣言
 class Player;
+// ゲームシーンクラスの前方宣言
+class GameScene;
 
 class Enemy 
 {
@@ -19,7 +21,7 @@ public:
 	/// </summary>
 	///< param name = "model">モデル</param>
 	/// ///<param name = "textureHandle">テクスチャハンドル</param>
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -59,8 +61,6 @@ public:
 	// 発射間隔
 	static const int kFireInterval = 60;
 
-	void SetPlayer(Player* player) { player_ = player; }
-
 	// ワールド座標を取得
 	Vector3 GetWorldPosition();
 
@@ -68,10 +68,17 @@ public:
 	void Oncollision();
 
 	// 弾リストを取得
-	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
+	//const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
 
 	const float GetRadius() { return radius_; }
 	const float radius_ = 1.0f;
+
+	// セッター
+	void SetPlayer(Player* player) { player_ = player; }
+
+	void SetGameScene(GameScene* gameScene){gameScene_ = gameScene;}
+
+	bool GetIsDead() const { return isDead_; };
 
 private:
 	// ワールド変換データ
@@ -92,12 +99,22 @@ private:
 	Phase phase_ = Phase::Approach;
 
 	// 弾
-	std::list<EnemyBullet*> bullets_;
+	//std::list<EnemyBullet*> bullets_;
 
 	// 発射タイマー
 	int32_t fireTimer = 0;
 
 	// 自キャラ
 	Player* player_ = nullptr;
+
+	// ゲームシーン
+	GameScene* gameScene_ = nullptr;
+
+	// 寿命<frm>
+	static const int32_t kLifeTime = 60 * 5;
+	// デスタイマー
+	int32_t deathTimer_ = kLifeTime;
+	// デスフラグ
+	bool isDead_ = false;
 
 };

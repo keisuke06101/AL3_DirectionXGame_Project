@@ -10,9 +10,11 @@
 #include "WorldTransform.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "EnemyBullet.h"
 #include "Skydome.h"
 #include "RailCamera.h"
 #include "DebugCamera.h"
+#include <sstream>
 
 /// <summary>
 /// ゲームシーン
@@ -50,6 +52,24 @@ public: // メンバ関数
 	/// </summary>
 	void CheckAllCollisions();
 
+	/// <summary>
+	/// 敵弾を追加する
+	/// </summary>
+	/// <param name="enemyBullet"></param>
+	void AddEnemyBullet(EnemyBullet* enemyBullet);
+
+	void AddEnemy(Vector3 pos);
+
+	/// <summary>
+	/// 敵発生のデータ読み込み
+	/// </summary>
+	void LoadEnemyPopData();
+
+	/// <summary>
+	/// 敵発生コマンドの更新
+	/// </summary>
+	void UpdateEnemyPopCommands();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -80,7 +100,7 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 
 	//敵
-	Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemy_;
 
 	// プレイヤーの弾
 	PlayerBullet* playerBullet_ = nullptr;
@@ -99,5 +119,10 @@ private: // メンバ変数
 	// 3Dモデル
 	Model* modelSkydome_ = nullptr;
 
+	std::list<EnemyBullet*> enemyBullets_;
 
+	// 敵発生コマンド
+	std::stringstream enemyPopCommands;
+	bool isWait = 0;
+	int waitTimer;
 };
