@@ -114,11 +114,7 @@ void Player::Update(ViewProjection& viewProjection) {
 	const float kMoveLimitX = 20.0f;
 	const float kMoveLimitY = 20.0f;
 
-	//範囲を超えない処理
-	worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
-	worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
-	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
-	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
+	
 
 	//座標移動（ベクトルの加算）
 	worldTransform_.translation_.x += move.x;
@@ -132,6 +128,12 @@ void Player::Update(ViewProjection& viewProjection) {
 
 	// キャラクターの旋回
 	Rotate();
+
+	// 範囲を超えない処理
+	worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
+	worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
+	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
+	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 
 	// 行列を定数バッファーに転送
 	worldTransform_.UpdateMatrix();

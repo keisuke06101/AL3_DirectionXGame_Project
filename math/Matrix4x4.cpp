@@ -36,7 +36,7 @@ Matrix4x4 MakeRotY(float theta) {
 	result = {cos,    0.0f, -sin,    0.0f, 
 		      0.0f,   1.0f, 0.0f,    0.0f, 
 		      sin,    0.0f, cos,     0.0f, 
-		      1.0f,   0.0f, 0.0f,    1.0f};
+		      0.0f,   0.0f, 0.0f,    1.0f};
 
 	return result;
 };
