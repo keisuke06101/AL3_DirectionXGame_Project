@@ -4,8 +4,10 @@
 #include "ImGuiManager.h"
 #include "PlayerBullet.h"
 #include "MathUtility.h"
+#include "Matrix4x4.h"
 #include <cassert>
 #include <list>
+#include <Sprite.h>
 #pragma once
 
 /// <summary>
@@ -23,12 +25,17 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
+
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
 
 	/// <summary>
 	/// 攻撃
@@ -64,14 +71,23 @@ public:
 	void SetParent(const WorldTransform* parent);
 
 private:
+
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	// 3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+	// 2Dレティクル用スプライト
+	Sprite* sprite2DReticle_ = nullptr;
 
 	// モデル
 	Model* model_ = nullptr;
+	Model* modelReticle_ = nullptr;
 
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+	uint32_t tectureHandleR_ = 0u;
 
 	//キーボード入力
 	Input* input_ = nullptr;

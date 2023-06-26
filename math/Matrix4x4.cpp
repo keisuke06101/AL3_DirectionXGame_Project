@@ -90,6 +90,58 @@ Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2)
 
 	return result *= m2;
 }
+Vector3& operator+=(Vector3& v1, const Vector3& v2) {
+	// TODO: return ステートメントをここに挿入します
+	v1.x += v2.x;
+	v1.y += v2.y;
+	v1.z += v2.z;
+
+	return v1;
+}
+const Vector3 operator+(const Vector3& v1, const Vector3& v2) {
+	Vector3 tmp(v1);
+	return tmp += v2;
+}
+Vector3& operator-=(Vector3& v1, const Vector3& v2)
+{
+	// TODO: return ステートメントをここに挿入します
+	v1.x -= v2.x;
+	v1.y -= v2.y;
+	v1.z -= v2.z;
+
+	return v1;
+}
+const Vector3 operator-(const Vector3& v1, const Vector3& v2) 
+{ 
+	Vector3 tmp(v1);
+	return tmp -= v2;
+}
+Vector3& operator*=(Vector3& v, float s) {
+	// TODO: return ステートメントをここに挿入します
+	v.x *= s;
+	v.y *= s;
+	v.z *= s;
+
+	return v;
+}
+const Vector3 operator*(const Vector3& v, float s) 
+{
+	Vector3 tmp(v);
+	return tmp *= s;
+}
+Vector3& operator/=(Vector3& v, float s) {
+	// TODO: return ステートメントをここに挿入します
+	v.x /= s;
+	v.y /= s;
+	v.z /= s;
+
+	return v;
+}
+const Vector3 operator/(const Vector3& v, float s) 
+{ 
+	Vector3 tmp(v);
+	return tmp /= s;
+}
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate)
 {
 	//スケーリング行列
@@ -107,6 +159,30 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vecto
 
 	//合成
 	Matrix4x4 result = matScale * matRot * matTrans;
+
+	return result;
+}
+
+Matrix4x4 MakeViewportMatrix(
+    float left, float top, float width, float height, float minDepth, float maxDepth) {
+	Matrix4x4 result;
+	result = {
+	    width / 2,
+	    0.0f,
+	    0.0f,
+	    0.0f,
+	    0.0f,
+	    -height / 2,
+	    0.0f,
+	    0.0f,
+	    0.0f,
+	    0.0f,
+	    maxDepth - minDepth,
+	    0.0f,
+	    left + width / 2,
+	    top + height / 2,
+	    minDepth,
+	    1.0f};
 
 	return result;
 }
@@ -250,4 +326,33 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	    determinantRecp;
 
 	return resultInverse;
+}
+
+Vector3 Multiply(float scalar, const Vector3& v) {
+	return {scalar * v.x, scalar * v.y, scalar * v.z};
+}
+
+float Length(const Vector3& v) { return sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
+
+Vector3 Normalize(const Vector3& v)
+{
+	float length = Length(v);
+	return {v.x / length, v.y / length, v.z / length};
+}
+
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) 
+{
+	Vector3 result;
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] +
+	           1.0f * matrix.m[3][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] +
+	           1.0f * matrix.m[3][1];
+	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] +
+	           1.0f * matrix.m[3][2];
+	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] +
+	          1.0f * matrix.m[3][3];
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+	return result;
 }

@@ -68,7 +68,7 @@ void GameScene::Update()
 		return false;
 	});
 	UpdateEnemyPopCommands();
-	player_->Update();
+	player_->Update(viewProjection_);
 	for (Enemy* enemy : enemy_) {
 	        enemy->Update();
 	}
@@ -98,6 +98,7 @@ void GameScene::Update()
 		viewProjection_.TransferMatrix();
 	}
 	CheckAllCollisions();
+
 }
 
 void GameScene::Draw() {
@@ -144,7 +145,7 @@ void GameScene::Draw() {
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
-
+	player_->DrawUI();
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
