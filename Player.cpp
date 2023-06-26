@@ -170,6 +170,10 @@ void Player::Attack()
 
 		//弾を登録する
 		bullets_.push_back(newBullet);
+
+		// 自機から照準オブジェクトへのベクトル
+		velocity = worldTransform3DReticle_.translation_ = GetWorldPosition();
+		velocity = Normalize(velocity) * kBulletSpeed;
 	}
 }
 
