@@ -34,12 +34,12 @@ void GameScene::Initialize() {
 	enemyBullet_ = new EnemyBullet;
 	skydome_ = new Skydome;
 	railCamera_ = new RailCamera;
+	player_ = new Player;
 	viewProjection_.Initialize();
 
 	railCamera_->Initialize({0, 0, 0}, {0,0,0});
 
 	// 自キャラとレールカメラの親子関係を結ぶ
-	player_ = new Player;
 	player_->Initialize(model_, textureHandle_, {0.f, 0.f, 20.f});
 	player_->SetParent(&railCamera_->GetWorldTransform());
 

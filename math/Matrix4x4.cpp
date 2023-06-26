@@ -328,6 +328,8 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	return resultInverse;
 }
 
+
+
 Vector3 Multiply(float scalar, const Vector3& v) {
 	return {scalar * v.x, scalar * v.y, scalar * v.z};
 }

@@ -46,9 +46,9 @@ void Player::Update(ViewProjection& viewProjection) {
 
 	// 自機のワールド座標から3Dレティクルのワールド座標を計算
 	// 自機から3Dレティクルへの距離
-	const float kDistancePlayerTo3DRectile = 50.f;
+	const float kDistancePlayerTo3DRectile = 50.0f;
 	// 自機から3Dレティクルへのオフセット（Z+向き）
-	Vector3 offset = {0, 0, 1.f};
+	Vector3 offset = {0.0f, 0.0f, 1.0f};
 	// 自機のワールド行列の回転を反映
 	offset = TransformNormal(offset, worldTransform_.matWorld_);
 	// ベクトルの長さを変える
@@ -225,11 +225,12 @@ void Player::SetParent(const WorldTransform* parent)
 /// </summary>
 void Player::Draw(ViewProjection& viewProjection)
  {
-	// 3Dレティクルの描画
-	modelReticle_->Draw(worldTransform3DReticle_, viewProjection);
 
 	//自キャラの描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+	// 3Dレティクルの描画
+	modelReticle_->Draw(worldTransform3DReticle_, viewProjection);
 
 	//弾描画
 	for (PlayerBullet* bullet : bullets_)
