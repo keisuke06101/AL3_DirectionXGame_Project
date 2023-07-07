@@ -12,6 +12,19 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	//引数で受け取った初期座標をセット
 	worldTransform_.translation_ = position;
 	velocity_ = velocity;
+
+	// Z方向に延びた形状
+	worldTransform_.scale_.x = 0.5f;
+	worldTransform_.scale_.y = 0.5f;
+	worldTransform_.scale_.z = 3.0f;
+
+	// Y軸周りの角度(0y)
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+	// 横方向の長さを求める
+	//worldTransform_.translation_ = worldTransform_.rotation_;
+	// X軸周りの角度(0x)
+	//velocity_.y = 0.0f;
+	worldTransform_.rotation_.x = std::atan2(velocity_.y, velocity_.z);
 }
 
 void EnemyBullet::Update() 

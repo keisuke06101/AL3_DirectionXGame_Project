@@ -69,19 +69,20 @@ void Enemy::Update()
 
 	switch (phase_) { 
 	case Phase::Approach:
-	default:
+		// 移動
 		phaseApproach();
+		if (worldTransform_.translation_.z <= 30.0f)
+		{
+			phase_ = Phase::Leave;
+		}
 		break;
-
 	case Phase::Leave:
 		phaseLeave();
 		break;
-	}
 
-	// 弾更新
-	/*for (EnemyBullet* bullet : bullets_) {
-		bullet->Update();
-	}*/
+	default:
+		break;
+	}
 }
 
 /// <summary>
