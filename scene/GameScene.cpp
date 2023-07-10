@@ -31,7 +31,6 @@ void GameScene::Initialize() {
 	model_ = Model::Create();
 	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
 	playerBullet_ = new PlayerBullet;
-	enemyBullet_ = new EnemyBullet;
 	skydome_ = new Skydome;
 	railCamera_ = new RailCamera;
 	player_ = new Player;
@@ -46,6 +45,10 @@ void GameScene::Initialize() {
 	// 3Dモデルの生成
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_->Initialize(modelSkydome_);
+
+	for (EnemyBullet* bullet : enemyBullets_) {
+		bullet->Initialize(model_, {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f});
+	}
 
 	AddEnemy({0.f, 5.f, 100.f});
 	LoadEnemyPopData();

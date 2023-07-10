@@ -358,3 +358,14 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
 	result.z /= w;
 	return result;
 }
+
+// Liner InterPolation
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) 
+{
+	Vector3 temp = { 
+		t * v2.x + (1.0f - t) * v1.x, 
+		t * v2.y + (1.0f - t) * v1.y, 
+		t * v2.z + (1.0f - t) * v1.z };
+	
+	return temp;
+}

@@ -66,3 +66,6 @@ Vector3 Normalize(const Vector3& v);
 
 // 座標変換
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
+
+// Liner InterPolation
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);

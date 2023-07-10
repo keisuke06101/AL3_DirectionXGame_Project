@@ -1,4 +1,5 @@
 ﻿#include "EnemyBullet.h"
+#include "Player.h"
 
 void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector3& velocity) {
 	// NULLポインタチェック
@@ -17,14 +18,6 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	worldTransform_.scale_.x = 0.5f;
 	worldTransform_.scale_.y = 0.5f;
 	worldTransform_.scale_.z = 3.0f;
-
-	// Y軸周りの角度(0y)
-	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
-	// 横方向の長さを求める
-	//worldTransform_.translation_ = worldTransform_.rotation_;
-	// X軸周りの角度(0x)
-	//velocity_.y = 0.0f;
-	worldTransform_.rotation_.x = std::atan2(velocity_.y, velocity_.z);
 }
 
 void EnemyBullet::Update() 
@@ -37,6 +30,28 @@ void EnemyBullet::Update()
 	worldTransform_.translation_.x += velocity_.x;
 	worldTransform_.translation_.y += velocity_.y;
 	worldTransform_.translation_.z += velocity_.z;
+
+	// 敵弾から自キャラへのベクトルを計算
+	Vector3 toPlayer = player_->GetWorldPosition() - worldTransform_.translation_;
+
+	// ベクトルを正規化する
+	Normalize(toPlayer);
+	Normalize(velocity_);
+
+	// 補間割合
+	float t = 1.0f;
+	// 弾の速度
+	float kBulletSpeed = 1.0f;
+
+	// 線形補間により、今の速度と自キャラへのベクトルを撃ち挿し、新たな速度とする
+	velocity_ = Lerp(velocity_, toPlayer, t) * kBulletSpeed;
+	// 進行方向に見た目の方向を合わせる
+	// Y軸周りの角度(0y)
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+	// X軸周りの角度(0x)
+	// velocity_.y = 0.0f;
+	worldTransform_.rotation_.x = std::atan2(velocity_.y, velocity_.z);
+
 
 	// 時間経過で消える
 	if (--deathTimer_ <= 0) {

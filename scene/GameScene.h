@@ -106,7 +106,7 @@ private: // メンバ変数
 	PlayerBullet* playerBullet_ = nullptr;
 
 	//　敵の弾
-	EnemyBullet* enemyBullet_ = nullptr;
+	std::list<EnemyBullet*> enemyBullets_;
 
 	// 天球
 	Skydome* skydome_ = nullptr;
@@ -119,7 +119,6 @@ private: // メンバ変数
 	// 3Dモデル
 	Model* modelSkydome_ = nullptr;
 
-	std::list<EnemyBullet*> enemyBullets_;
 
 	// 敵発生コマンド
 	std::stringstream enemyPopCommands;

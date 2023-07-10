@@ -2,6 +2,11 @@
 #include "WorldTransform.h"
 #include <cassert>
 
+// 前方宣言
+class Player;
+
+class Enemy;
+
 #pragma once
 class EnemyBullet {
 public:
@@ -34,6 +39,8 @@ public:
 	const float GetRadius() { return radius_; }
 	const float radius_ = 1.0f;
 
+	void SetPlayer(Player* player){player_ = player;}
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -53,4 +60,7 @@ private:
 	int32_t deathTimer_ = kLifeTime;
 	// デスフラグ
 	bool isDead_ = false;
+
+	// 自キャラ
+	Player* player_ = nullptr;
 };
