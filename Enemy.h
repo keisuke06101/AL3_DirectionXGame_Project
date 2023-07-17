@@ -3,6 +3,7 @@
 #include "ImGuiManager.h"
 #include "EnemyBullet.h"
 #include "MathUtility.h"
+#include "TimedCall.h"
 #include <cassert>
 #include <cmath>
 #include <list>
@@ -73,11 +74,17 @@ public:
 	const float GetRadius() { return radius_; }
 	const float radius_ = 1.0f;
 
+	/// <summary>
+	/// 弾を発射し、タイマーをリセットするコールバック関数
+	/// </summary>
+	void FireReset();
+
 	// セッター
 	void SetPlayer(Player* player) { player_ = player; }
 
 	void SetGameScene(GameScene* gameScene){gameScene_ = gameScene;}
 
+	//ゲッター
 	bool GetIsDead() const { return isDead_; };
 
 private:
@@ -116,5 +123,8 @@ private:
 	int32_t deathTimer_ = kLifeTime;
 	// デスフラグ
 	bool isDead_ = false;
+
+	// 時限発動のリスト
+	std::list<TimedCall*> timedCalls_;
 
 };

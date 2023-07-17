@@ -29,9 +29,10 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 
 Enemy::~Enemy() 
 {
-	/*for (EnemyBullet* bullet : bullets_) {
-		delete bullet;
-	}*/
+	// 範囲forでリストの全要素について回す
+	for (TimedCall* timedCall : timedCalls_) {
+		delete timedCall;
+	}
 }
 
 Vector3 Enemy::GetWorldPosition() 
@@ -47,19 +48,33 @@ Vector3 Enemy::GetWorldPosition()
 
 void Enemy::Oncollision() {}
 
+void Enemy::FireReset()
+{
+	// 弾を発射する
+	Fire();
+
+	// 発射タイマーをセットする
+	timedCalls_.push_back(new TimedCall(std::bind(&Enemy::FireReset, this), kFireInterval));
+}
+
 /// <summary>
 /// 更新
 /// </summary>
 void Enemy::Update()
 {
-	// デスフラグの立った弾を削除
-	/*bullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
+	// 終了したタイマーの削除
+	timedCalls_.remove_if([](TimedCall* time) {
+		if (time->IsFinished()) {
+			delete time;
 			return true;
 		}
 		return false;
-	});*/
+	});
+
+	// 範囲forでリストの全要素について回す
+	for (TimedCall* timedCall : timedCalls_) {
+		timedCall->Update();
+	}
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
@@ -77,11 +92,6 @@ void Enemy::Update()
 		phaseLeave();
 		break;
 	}
-
-	// 弾更新
-	/*for (EnemyBullet* bullet : bullets_) {
-		bullet->Update();
-	}*/
 }
 
 /// <summary>
@@ -92,17 +102,16 @@ void Enemy::Draw(ViewProjection& viewProjection)
 {
 	// 敵の描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
-	// 弾描画
-	/*for (EnemyBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}*/
 }
 
 void Enemy::phaseApproachInitialize() 
 {
 	// 発射タイマーの初期化
 	fireTimer = kFireInterval;
+
+	// 発射タイマーをセットする
+	timedCalls_.push_back(new TimedCall(std::bind(&Enemy::FireReset, this), fireTimer));
+
 }
 
 void Enemy::phaseApproach()
@@ -112,19 +121,19 @@ void Enemy::phaseApproach()
 	// 移動ベクトル
 	worldTransform_.translation_.z -= kApproachSpeed;
 	// 既定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 0.0f) {
+	if (worldTransform_.translation_.z < 30.0f) {
 		phase_ = Phase::Leave;
 	}
 
-	// 発射タイマーカウントダウン
-	fireTimer--;
-	// 指定時間に達した
-	if (fireTimer <= 0) {
-		// 弾を発射
-		Fire();
-		// 発射タイマーを初期化
-		fireTimer = kFireInterval;
-	}
+	//// 発射タイマーカウントダウン
+	//fireTimer--;
+	//// 指定時間に達した
+	//if (fireTimer <= 0) {
+	//	// 弾を発射
+	//	Fire();
+	//	// 発射タイマーを初期化
+	//	fireTimer = kFireInterval;
+	//}
 }
 
 void Enemy::phaseLeave()
@@ -133,12 +142,11 @@ void Enemy::phaseLeave()
 	const float kLeaveSpeed = 0.2f;
 	// 移動ベクトル
 	worldTransform_.translation_.x += kLeaveSpeed;
-	//worldTransform_.translation_.y += kLeaveSpeed;
-	//worldTransform_.translation_.z -= kLeaveSpeed;
 	// 時間経過で消える
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
+	timedCalls_.clear();
 }
 
 void Enemy::Fire()
