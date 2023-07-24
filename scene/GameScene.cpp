@@ -159,7 +159,6 @@ void GameScene::Draw() {
 
 void GameScene::CheckAllCollisions()
 {
-
 	// 自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 	// 敵弾リストの取得
@@ -169,8 +168,9 @@ void GameScene::CheckAllCollisions()
 	std::list<Collider*> colliders_;
 	// コライダーをリストに登録
 	colliders_.push_back(player_);
-	colliders_.push_back(enemy_);
-
+	for (Enemy* enemy : enemy_) {
+		colliders_.push_back(enemy);
+	}
 	// 自弾すべてについて
 	for (PlayerBullet* pBullet : playerBullets) {
 		colliders_.push_back(pBullet);
@@ -180,43 +180,23 @@ void GameScene::CheckAllCollisions()
 		// ペアの衝突判定
 		CheckCollisionPair(player_, bullet);
 	}
-	// 自キャラと敵弾の当たり判定
-	#pragma region 
+	
+	// リスト内のペアに総当たり
+	std::list<Collider*>::iterator itrA = colliders_.begin();
+	for (; itrA != colliders_.end(); ++itrA) {
+	
+		Collider* A = *itrA;
 
-	// 自キャラと敵弾すべての当たり判定
-	for (EnemyBullet* bullet : enemyBullets)
-	{
-		// ペアの衝突判定
-		CheckCollisionPair(player_, bullet);
-	}
-
-	#pragma endregion
-
-
-	// 自弾の敵キャラの当たり判定
-    #pragma region
-	for (Enemy* enemy : enemy_) {
-		
-		// 自弾と敵キャラすべての当たり判定
-		for (PlayerBullet* bullet : playerBullets) {
-			// ペアの衝突判定
-			CheckCollisionPair(enemy, bullet);
+		// イテレータBはイテレータAの次の要素から回す（重複判定を回避）
+		std::list<Collider*>::iterator itrB = itrA;
+		itrB++;
+		for (; itrB != colliders_.end(); ++itrB) {
+			Collider* B = *itrB;
+			
+			// ペアの当たり判定
+			CheckCollisionPair(A, B);
 		}
 	}
-    #pragma endregion
-
-	// 自弾の敵弾の当たり判定
-    #pragma region
-	// 敵弾座標
-	for (EnemyBullet* eBullet : enemyBullets) {
-
-		// 自弾と敵キャラすべての当たり判定
-		for (PlayerBullet* pBullet : playerBullets) {
-			// ペアの衝突判定
-			CheckCollisionPair(eBullet, pBullet);
-		}
-	}
-    #pragma endregion
 }
 
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet)
@@ -319,6 +299,11 @@ void GameScene::UpdateEnemyPopCommands()
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB)
 {
+	// 衝突フィルタリング
+	if (colliderA->GetCA() != colliderB->GetCM() || colliderB->GetCA() != colliderA->GetCM()) {
+		return;
+	}
+
 	//// colliderAのワールド座標を取得
 	//colliderA->GetWorldPosition();
 	//// colliderBのワールド座標を取得
@@ -346,4 +331,5 @@ void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB)
 		// コライダーBの衝突時コールバックを呼び出す
 		colliderB->OnCollision();
 	}
+
 }

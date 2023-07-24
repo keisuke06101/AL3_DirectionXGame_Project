@@ -14,6 +14,11 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 
 	//引数で受け取った初期座標をセット
 	worldTransform_.translation_ = position;
+
+	// 衝突属性を設定
+	SetCA(kCollisionAttributePlayer);
+	// 衝突対象を自分の属性以外に設定
+	SetCM(kCollisionAttributeEnemy);
 }
 
 void PlayerBullet::Update() 

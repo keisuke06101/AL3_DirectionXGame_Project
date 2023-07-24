@@ -110,6 +110,7 @@
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CollisionConfig.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
     <ClCompile Include="main.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="CollisionConfig.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
     <ClInclude Include="input\Input.h" />
@@ -158,6 +160,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="RailCamera.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="TimedCall.h" />
@@ -216,6 +219,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Sprite.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectXGame.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

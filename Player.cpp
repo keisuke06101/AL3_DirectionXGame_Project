@@ -37,6 +37,11 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 playerPosi
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
+
+	// 衝突属性を設定
+	SetCA(kCollisionAttributePlayer);
+	// 衝突対象を自分の属性以外に設定
+	SetCM(kCollisionAttributeEnemy);
 }
 
 /// <summary>

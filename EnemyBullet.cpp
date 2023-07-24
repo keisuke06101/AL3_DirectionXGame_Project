@@ -12,6 +12,11 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	//引数で受け取った初期座標をセット
 	worldTransform_.translation_ = position;
 	velocity_ = velocity;
+
+	// 衝突属性を設定
+	SetCA(kCollisionAttributeEnemy);
+	// 衝突対象を自分の属性以外に設定
+	SetCM(kCollisionAttributePlayer);
 }
 
 void EnemyBullet::Update() 

@@ -24,6 +24,11 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	// 接近フェーズの初期化
 	phaseApproachInitialize();
 
+	// 衝突属性を設定
+	SetCA(kCollisionAttributeEnemy);
+	// 衝突対象を自分の属性以外に設定
+	SetCM(kCollisionAttributePlayer);
+
 }
 
 
