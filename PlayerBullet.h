@@ -1,9 +1,10 @@
 ﻿#pragma once
 #include "Model.h"
+#include "Collider.h"
 #include "WorldTransform.h"
 #include <cassert>
 
-class PlayerBullet
+class PlayerBullet : public Collider
 {
 public:
 	/// <summary>
@@ -24,13 +25,16 @@ public:
 	bool IsDead() const { return isDead_; }
 
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	// 衝撃を検出したら呼び出されるコールバック関数
-	void Oncollision();
+	void OnCollision()override;
 
 	const float GetRadius() { return radius_; }
 	const float radius_ = 1.0f;
+
+	// 衝突時に呼ばれる関数
+	//void OnCollision() override;
 
 private:
 	// ワールド変換データ

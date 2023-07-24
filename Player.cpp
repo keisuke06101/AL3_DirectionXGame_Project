@@ -260,7 +260,7 @@ Vector3 Player::GetWorldPosition()
 	return worldPos;
 }
 
-void Player::Oncollision() {}
+void Player::OnCollision() {}
 
 void Player::SetParent(const WorldTransform* parent)
 {

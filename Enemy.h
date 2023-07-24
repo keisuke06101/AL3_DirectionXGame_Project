@@ -1,4 +1,5 @@
 ﻿#include "Model.h"
+#include "Collider.h"
 #include "WorldTransform.h"
 #include "ImGuiManager.h"
 #include "EnemyBullet.h"
@@ -14,7 +15,7 @@ class Player;
 // ゲームシーンクラスの前方宣言
 class GameScene;
 
-class Enemy 
+class Enemy : public Collider
 {
 public:
 	/// <summary>
@@ -63,10 +64,10 @@ public:
 	static const int kFireInterval = 60;
 
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	// 衝撃を検出したら呼び出されるコールバック関数
-	void Oncollision();
+	void OnCollision() override;
 
 	// 弾リストを取得
 	//const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
@@ -86,6 +87,9 @@ public:
 
 	//ゲッター
 	bool GetIsDead() const { return isDead_; };
+
+	// 衝突時に呼ばれる関数
+	//void OnCollision() override;
 
 private:
 	// ワールド変換データ

@@ -125,4 +125,11 @@ private: // メンバ変数
 	std::stringstream enemyPopCommands;
 	bool isWait = 0;
 	int waitTimer;
+
+	/// <summary>
+	/// コライダー２つの衝突判定と応答
+	/// </summary>
+	/// <param name="colliderA"></param>
+	/// <param name="colliderB"></param>
+	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
 };

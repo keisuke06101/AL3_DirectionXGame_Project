@@ -46,7 +46,7 @@ Vector3 Enemy::GetWorldPosition()
 	return worldPos;
 }
 
-void Enemy::Oncollision() {}
+void Enemy::OnCollision() {}
 
 void Enemy::FireReset()
 {

@@ -1,4 +1,5 @@
 ﻿#include "Model.h"
+#include "Collider.h"
 #include "WorldTransform.h"
 #include "Input.h"
 #include "ImGuiManager.h"
@@ -13,7 +14,7 @@
 /// <summary>
 /// 自キャラ
 /// </summary>
-class Player {
+class Player : public Collider{
 public:
 	/// <summary>
 	/// 初期化
@@ -53,10 +54,10 @@ public:
 	~Player();
 
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	// 衝撃を検出したら呼び出されるコールバック関数
-	void Oncollision();
+	void OnCollision() override;
 
 	// 弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
@@ -69,6 +70,9 @@ public:
 	/// </summary>
 	/// <param name="parent"></param>
 	void SetParent(const WorldTransform* parent);
+
+	// 衝突時に呼ばれる関数
+	//void OnCollision() override;
 
 private:
 
