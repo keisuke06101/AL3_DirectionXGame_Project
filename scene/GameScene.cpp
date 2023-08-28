@@ -13,6 +13,7 @@ GameScene::~GameScene()
 	delete skydome_;
 	delete modelSkydome_;
 	delete railCamera_;
+	delete explanation_;
 	for (Enemy* enemy : enemy_) {
 		delete enemy;
 	}
@@ -27,7 +28,8 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	textureHandle_ = TextureManager::Load("sample.png");
-	enemyTextureHandle_ = TextureManager::Load("nu.png");
+	enemyTextureHandle_ = TextureManager::Load("obake1.png");
+	textureHandleE_ = TextureManager::Load("nu.png");
 	model_ = Model::Create();
 	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
 	playerBullet_ = new PlayerBullet;
@@ -36,6 +38,9 @@ void GameScene::Initialize() {
 	railCamera_ = new RailCamera;
 	player_ = new Player;
 	viewProjection_.Initialize();
+
+	explanation_ = new Explanation;
+	explanation_->Initialize(model_, textureHandleE_, {0.f, 0.f, 20.f});
 
 	railCamera_->Initialize({0, 0, 0}, {0,0,0});
 
@@ -59,6 +64,7 @@ void GameScene::Update()
     		isDebugCameraActive_ = true;
     	}
     #endif // DEBUG 
+	
 	// デスフラグの立った弾を削除
 	enemyBullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -73,11 +79,11 @@ void GameScene::Update()
 	        enemy->Update();
 	}
 	skydome_->Update();
+	
 	// 弾更新
 	for (EnemyBullet* bullet : enemyBullets_) {
 		    bullet->Update();
 	}
-	
 
 	if (isDebugCameraActive_)
 	{
@@ -127,12 +133,17 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	/// 
+	
+	explanation_->Draw(viewProjection_);
+
 	player_->Draw(viewProjection_);
+	
 	for (Enemy* enemy : enemy_) {
 		enemy->Draw(viewProjection_);
 	}
 	skydome_->Draw(viewProjection_);
-
+	
 	// 弾描画
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Draw(viewProjection_);
@@ -155,6 +166,56 @@ void GameScene::Draw() {
 
 #pragma endregion
 
+}
+
+void GameScene::ExplanationUpdate() 
+{ explanation_->Update(); }
+
+void GameScene::ExplanationDraw()
+{
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+
+#pragma region 背景スプライト描画
+	// 背景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+
+	/// <summary>
+	/// ここに背景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+	// 深度バッファクリア
+	dxCommon_->ClearDepthBuffer();
+#pragma endregion
+
+#pragma region 3Dオブジェクト描画
+	// 3Dオブジェクト描画前処理
+	Model::PreDraw(commandList);
+
+	/// <summary>
+	/// ここに3Dオブジェクトの描画処理を追加できる
+	/// </summary>
+	///
+
+	explanation_->Draw(viewProjection_);
+
+	// 3Dオブジェクト描画後処理
+	Model::PostDraw();
+#pragma endregion
+
+#pragma region 前景スプライト描画
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+	/// <summary>
+	/// ここに前景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+
+#pragma endregion
 }
 
 void GameScene::CheckAllCollisions()

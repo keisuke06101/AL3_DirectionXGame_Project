@@ -8,6 +8,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Explanation.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "EnemyBullet.h"
@@ -15,6 +16,7 @@
 #include "RailCamera.h"
 #include "DebugCamera.h"
 #include <sstream>
+#include <Novice.h>
 
 /// <summary>
 /// ゲームシーン
@@ -48,6 +50,16 @@ public: // メンバ関数
 	void Draw();
 
 	/// <summary>
+	/// 操作説明表示処理
+	/// </summary>
+	void ExplanationUpdate();
+
+	/// <summary>
+	/// 操作説明描画
+	/// </summary>
+	void ExplanationDraw();
+
+	/// <summary>
 	/// 衝突判定と応答
 	/// </summary>
 	void CheckAllCollisions();
@@ -71,6 +83,7 @@ public: // メンバ関数
 	void UpdateEnemyPopCommands();
 
 private: // メンバ変数
+
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
@@ -81,20 +94,24 @@ private: // メンバ変数
 	
 	uint32_t textureHandle_ = 0;
 	uint32_t enemyTextureHandle_ = 0;
+	uint32_t textureHandleE_ = 0;
 
 	Model* model_ = nullptr;
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 
-	//ビュープロジェクション
+	// ビュープロジェクション
 	ViewProjection viewProjection_;
 	
-	//デバックカメラ有効
+	// デバックカメラ有効
 	bool isDebugCameraActive_ = false;
 
-	//デバックカメラ
+	// デバックカメラ
 	DebugCamera* debugCamera_ = nullptr;
+
+	// 操作説明
+	Explanation* explanation_ = nullptr;
 
 	//プレイヤー
 	Player* player_ = nullptr;
@@ -132,4 +149,5 @@ private: // メンバ変数
 	/// <param name="colliderA"></param>
 	/// <param name="colliderB"></param>
 	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
+
 };

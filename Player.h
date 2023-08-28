@@ -99,4 +99,16 @@ private:
 	// 弾
 	std::list<PlayerBullet*> bullets_;
 
+	// シェイク演出用変数
+	int shakeTimer_ = 0;
+	bool isRand_ = 0;
+	bool isRandP_ = 0;
+
+	int randX_ = 0;
+	int randY_ = 0;
+	int randZ_ = 0;
+	int i_ = 21;
+
+	bool isDead_ = 0;
+
 };

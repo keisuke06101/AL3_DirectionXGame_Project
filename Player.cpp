@@ -1,12 +1,12 @@
 ﻿#include "Player.h"
 
-
 /// <summary>
 /// 初期化
 /// </summary>
 /// <param name="model"></param>
 /// <param name="textureHandle"></param>
 void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 playerPosition) {
+	
 	// NULLポイントチェック
 	assert(model);
 
@@ -47,7 +47,8 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 playerPosi
 /// <summary>
 /// 更新
 /// </summary>
-void Player::Update(ViewProjection& viewProjection) {
+void Player::Update(ViewProjection& viewProjection)
+{
 
 	// 自機のワールド座標から3Dレティクルのワールド座標を計算
 	// 自機から3Dレティクルへの距離
@@ -161,8 +162,6 @@ void Player::Update(ViewProjection& viewProjection) {
 	const float kMoveLimitX = 20.0f;
 	const float kMoveLimitY = 20.0f;
 
-	
-
 	//座標移動（ベクトルの加算）
 	worldTransform_.translation_.x += move.x;
 	worldTransform_.translation_.y += move.y;
@@ -198,6 +197,31 @@ void Player::Update(ViewProjection& viewProjection) {
 	for (PlayerBullet* bullet : bullets_)
 	{
 		bullet->Update();
+	}
+
+	// シェイク
+	if (isRand_) {
+		shakeTimer_ += 1;
+	}
+	if (shakeTimer_ == 2) {
+		randX_ = rand() % i_ - 3;
+		randY_ = rand() % i_ - 3;
+		randZ_ = rand() % i_ - 3;
+		worldTransform_.rotation_.x += randX_;
+		worldTransform_.rotation_.y -= randY_;
+		worldTransform_.rotation_.z -= randZ_;
+		i_--;
+		shakeTimer_ = 0;
+
+		if (i_ == 0) {
+			randX_ = 0;
+			randY_ = 0;
+			worldTransform_.rotation_.x = 0;
+			worldTransform_.rotation_.y = 0;
+			worldTransform_.rotation_.z = 0;
+			i_ = 21;
+			isRand_ = false;
+		}
 	}
 
 }
@@ -265,7 +289,13 @@ Vector3 Player::GetWorldPosition()
 	return worldPos;
 }
 
-void Player::OnCollision() {}
+void Player::OnCollision() 
+{
+	// シェイク
+	isRand_ = true;
+	
+	//isDead_ = true;
+}
 
 void Player::SetParent(const WorldTransform* parent)
 {
@@ -283,13 +313,15 @@ void Player::Draw(ViewProjection& viewProjection)
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
 	// 3Dレティクルの描画
-	modelReticle_->Draw(worldTransform3DReticle_, viewProjection);
+	//modelReticle_->Draw(worldTransform3DReticle_, viewProjection);
 
 	//弾描画
 	for (PlayerBullet* bullet : bullets_)
 	{
 		bullet->Draw(viewProjection);
 	}
+
+	
 }
 
 void Player::DrawUI() 

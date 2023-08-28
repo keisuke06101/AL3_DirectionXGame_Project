@@ -13,7 +13,7 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 
 	// 受け渡し
 	model_ = model;
-	textureHandle_ = TextureManager::Load("nu.png");
+	textureHandle_ = TextureManager::Load("obake1.png");
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
@@ -51,7 +51,8 @@ Vector3 Enemy::GetWorldPosition()
 	return worldPos;
 }
 
-void Enemy::OnCollision() {}
+void Enemy::OnCollision() 
+{ isDead_ = true; }
 
 void Enemy::FireReset()
 {
@@ -106,7 +107,9 @@ void Enemy::Update()
 void Enemy::Draw(ViewProjection& viewProjection)
 {
 	// 敵の描画
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (!isDead_) {
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	}
 }
 
 void Enemy::phaseApproachInitialize() 
@@ -157,29 +160,29 @@ void Enemy::phaseLeave()
 void Enemy::Fire()
 {
 	assert(player_);
+	if (!isDead_) {
+		// 弾の速度
+		const float kBulletSpeed = 1.0f;
 
-	// 弾の速度
-	const float kBulletSpeed = 1.0f;
+		// 自キャラのワールド座標を取得する
+		player_->GetWorldPosition();
+		// 敵キャラのワールド座標を取得する
+		GetWorldPosition();
+		// 敵キャラ->自キャラの差分ベクトル
+		Vector3 vec{
+		    player_->GetWorldPosition().x - GetWorldPosition().x,
+		    player_->GetWorldPosition().y - GetWorldPosition().y,
+		    player_->GetWorldPosition().z - GetWorldPosition().z};
+		float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+		Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
+		Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
 
-	// 自キャラのワールド座標を取得する
-	player_->GetWorldPosition();
-	// 敵キャラのワールド座標を取得する
-	GetWorldPosition();
-	// 敵キャラ->自キャラの差分ベクトル
-	Vector3 vec{
-	    player_->GetWorldPosition().x - GetWorldPosition().x,
-	    player_->GetWorldPosition().y - GetWorldPosition().y,
-	    player_->GetWorldPosition().z - GetWorldPosition().z
-	};
-	float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-	Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
-	Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
-	
-	// 弾を生成し、初期化
-	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+		// 弾を生成し、初期化
+		EnemyBullet* newBullet = new EnemyBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
-	// 弾を登録する
-	gameScene_->AddEnemyBullet(newBullet);
+		// 弾を登録する
+		gameScene_->AddEnemyBullet(newBullet);
+	}
 }
 

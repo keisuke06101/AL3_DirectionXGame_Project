@@ -2,10 +2,12 @@
 #include "AxisIndicator.h"
 #include "DirectXCommon.h"
 #include "GameScene.h"
+#include "SceneManager.h"
 #include "ImGuiManager.h"
 #include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include "WinApp.h"
+#include <Novice.h>
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -17,6 +19,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	GameScene* gameScene = nullptr;
+	SceneManager* sceneManager = nullptr;
+	//TitleScene* titleScene = nullptr;
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
@@ -27,6 +31,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon->Initialize(win);
 
 #pragma region 汎用機能初期化
+	
 	// ImGuiの初期化
 	ImGuiManager* imguiManager = ImGuiManager::GetInstance();
 	imguiManager->Initialize(win, dxCommon);
@@ -57,9 +62,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	primitiveDrawer->Initialize();
 #pragma endregion
 
+	// タイトルシーンの初期化
+	//titleScene = new TitleScene();
+	//titleScene->Initialize();
+
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
+
+    // シーンすべての管理する処理の初期化
+	sceneManager = new SceneManager();
+	sceneManager->Initialize();
 
 	// メインループ
 	while (true) {
@@ -72,8 +85,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		imguiManager->Begin();
 		// 入力関連の毎フレーム処理
 		input->Update();
+		// タイトルシーンの毎フレーム処理
+		//titleScene->Update();
 		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+		//gameScene->Update();
+		//  シーン管理のマイフレーム処理
+		sceneManager->Update();
 		// 軸表示の更新
 		axisIndicator->Update();
 		// ImGui受付終了
@@ -81,8 +98,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 描画開始
 		dxCommon->PreDraw();
+		// タイトルシーンの描画
+		//titleScene->Draw();
 		// ゲームシーンの描画
-		gameScene->Draw();
+		//gameScene->Draw();
+		//  シーン管理の描画処理
+		sceneManager->Draw();
 		// 軸表示の描画
 		axisIndicator->Draw();
 		// プリミティブ描画のリセット
