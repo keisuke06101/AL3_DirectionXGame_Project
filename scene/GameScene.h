@@ -12,7 +12,10 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "EnemyBullet.h"
+#include "Boss.h"
+#include "BossBullet.h"
 #include "Skydome.h"
+#include "Score.h"
 #include "RailCamera.h"
 #include "DebugCamera.h"
 #include <sstream>
@@ -73,6 +76,12 @@ public: // メンバ関数
 	void AddEnemy(Vector3 pos);
 
 	/// <summary>
+	/// ボス弾を追加する
+	/// </summary>
+	/// <param name="bossBullet"></param>
+	void AddBossBullet(BossBullet* bossBullet);
+
+	/// <summary>
 	/// 敵発生のデータ読み込み
 	/// </summary>
 	void LoadEnemyPopData();
@@ -119,11 +128,17 @@ private: // メンバ変数
 	//敵
 	std::list<Enemy*> enemy_;
 
+	// ボス
+	Boss* boss_ = nullptr;
+
 	// プレイヤーの弾
 	PlayerBullet* playerBullet_ = nullptr;
 
 	//　敵の弾
 	EnemyBullet* enemyBullet_ = nullptr;
+
+	// ボスの弾
+	BossBullet* bossBullet_ = nullptr;
 
 	// 天球
 	Skydome* skydome_ = nullptr;
@@ -137,6 +152,7 @@ private: // メンバ変数
 	Model* modelSkydome_ = nullptr;
 
 	std::list<EnemyBullet*> enemyBullets_;
+	std::list<BossBullet*> bossBullets_;
 
 	// 敵発生コマンド
 	std::stringstream enemyPopCommands;

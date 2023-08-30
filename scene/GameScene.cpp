@@ -10,6 +10,7 @@ GameScene::~GameScene()
 	delete debugCamera_;
 	delete model_;
 	delete player_;
+	delete boss_;
 	delete skydome_;
 	delete modelSkydome_;
 	delete railCamera_;
@@ -18,6 +19,9 @@ GameScene::~GameScene()
 		delete enemy;
 	}
 	for (EnemyBullet* bullet : enemyBullets_) {
+		delete bullet;
+	}
+	for (BossBullet* bullet : bossBullets_) {
 		delete bullet;
 	}
 }
@@ -32,11 +36,13 @@ void GameScene::Initialize() {
 	textureHandleE_ = TextureManager::Load("nu.png");
 	model_ = Model::Create();
 	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
+	player_ = new Player;
 	playerBullet_ = new PlayerBullet;
 	enemyBullet_ = new EnemyBullet;
+	boss_ = new Boss;
+	bossBullet_ = new BossBullet;
 	skydome_ = new Skydome;
 	railCamera_ = new RailCamera;
-	player_ = new Player;
 	viewProjection_.Initialize();
 
 	explanation_ = new Explanation;
@@ -78,12 +84,17 @@ void GameScene::Update()
 	for (Enemy* enemy : enemy_) {
 	        enemy->Update();
 	}
-	skydome_->Update();
-	
 	// 弾更新
 	for (EnemyBullet* bullet : enemyBullets_) {
 		    bullet->Update();
 	}
+	boss_->Update();
+	// ボス弾更新
+	for (BossBullet* bullet : bossBullets_) {
+		    bullet->Update();
+	}
+
+	skydome_->Update();
 
 	if (isDebugCameraActive_)
 	{
@@ -135,7 +146,7 @@ void GameScene::Draw() {
 	/// </summary>
 	/// 
 	
-	explanation_->Draw(viewProjection_);
+	//explanation_->Draw(viewProjection_);
 
 	player_->Draw(viewProjection_);
 	
@@ -146,6 +157,12 @@ void GameScene::Draw() {
 	
 	// 弾描画
 	for (EnemyBullet* bullet : enemyBullets_) {
+		bullet->Draw(viewProjection_);
+	}
+
+	boss_->Draw(viewProjection_);
+	// ボス弾更新
+	for (BossBullet* bullet : bossBullets_) {
 		bullet->Draw(viewProjection_);
 	}
 
@@ -224,6 +241,8 @@ void GameScene::CheckAllCollisions()
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 	// 敵弾リストの取得
 	const std::list<EnemyBullet*>& enemyBullets = enemyBullets_;
+	// ボス弾リスト
+	const std::list<BossBullet*>& bossBullets = bossBullets_;
 
 	// コライダー
 	std::list<Collider*> colliders_;
@@ -238,6 +257,11 @@ void GameScene::CheckAllCollisions()
 	}
 	// 敵弾すべてについて
 	for (EnemyBullet* bullet : enemyBullets) {
+		// ペアの衝突判定
+		CheckCollisionPair(player_, bullet);
+	}
+	// ボス弾すべてについて
+	for (BossBullet* bullet : bossBullets) {
 		// ペアの衝突判定
 		CheckCollisionPair(player_, bullet);
 	}
@@ -279,8 +303,13 @@ void GameScene::AddEnemy(Vector3 pos)
 	enemy_.push_back(obj);
 }
 
-void GameScene::LoadEnemyPopData()
+void GameScene::AddBossBullet(BossBullet* bossBullet)
 {
+	// リストに登録する
+	bossBullets_.push_back(bossBullet);
+}
+
+void GameScene::LoadEnemyPopData() {
 	// ファイルを開く
 	std::ifstream file;
 	file.open("./Resources/enemyPop.csv");
@@ -306,6 +335,7 @@ void GameScene::UpdateEnemyPopCommands()
 		}
 		return;
 	}
+
 	// 1行分の文字列を入れる変数
 	std::string line;
 

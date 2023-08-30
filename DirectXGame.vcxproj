@@ -109,6 +109,8 @@
     <ClCompile Include="2d\ImGuiManager.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
+    <ClCompile Include="Boss.cpp" />
+    <ClCompile Include="BossBullet.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionConfig.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -123,6 +125,7 @@
     <ClCompile Include="Explanation.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="Score.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="TimedCall.cpp" />
     <ClCompile Include="WorldTransformEx.cpp" />
@@ -150,6 +153,8 @@
     <ClInclude Include="base\SafeDelete.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
+    <ClInclude Include="Boss.h" />
+    <ClInclude Include="BossBullet.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionConfig.h" />
     <ClInclude Include="Enemy.h" />
@@ -168,6 +173,7 @@
     <ClInclude Include="Explanation.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="Score.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="TimedCall.h" />
   </ItemGroup>
