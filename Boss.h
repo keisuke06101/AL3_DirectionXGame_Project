@@ -60,10 +60,10 @@ public:
 	// 発射間隔
 	static const int kFireInterval = 60;
 
-	void SetPlayer(Player* player) { player_ = player; }
-
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
+
+	void SetPlayer(Player* player) { player_ = player; }
 
 private:
 	// ワールド変換データ

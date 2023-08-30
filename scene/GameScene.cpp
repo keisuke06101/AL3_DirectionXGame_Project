@@ -59,6 +59,9 @@ void GameScene::Initialize() {
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_->Initialize(modelSkydome_);
 
+	// 敵キャラに自キャラのアドレスを渡す
+	boss_->SetPlayer(player_);
+
 	AddEnemy({0.f, 5.f, 100.f});
 	LoadEnemyPopData();
 }
@@ -82,9 +85,9 @@ void GameScene::Update()
 	});
 	UpdateEnemyPopCommands();
 	player_->Update(viewProjection_);
-	for (Enemy* enemy : enemy_) {
+	/*for (Enemy* enemy : enemy_) {
 	        enemy->Update();
-	}
+	}*/
 	// 弾更新
 	for (EnemyBullet* bullet : enemyBullets_) {
 		    bullet->Update();
@@ -242,8 +245,8 @@ void GameScene::CheckAllCollisions()
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 	// 敵弾リストの取得
 	const std::list<EnemyBullet*>& enemyBullets = enemyBullets_;
-	// ボス弾リスト
-	const std::list<BossBullet*>& bossBullets = bossBullets_;
+	//// ボス弾リスト
+	//const std::list<BossBullet*>& bossBullets = bossBullets_;
 
 	// コライダー
 	std::list<Collider*> colliders_;
@@ -261,11 +264,7 @@ void GameScene::CheckAllCollisions()
 		// ペアの衝突判定
 		CheckCollisionPair(player_, bullet);
 	}
-	// ボス弾すべてについて
-	for (BossBullet* bullet : bossBullets) {
-		// ペアの衝突判定
-		CheckCollisionPair(player_, bullet);
-	}
+	
 	
 	// リスト内のペアに総当たり
 	std::list<Collider*>::iterator itrA = colliders_.begin();
