@@ -21,9 +21,9 @@ GameScene::~GameScene()
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
 	}
-	for (BossBullet* bullet : bossBullets_) {
+	/*for (BossBullet* bullet : bossBullets_) {
 		delete bullet;
-	}
+	}*/
 }
 
 void GameScene::Initialize() {
@@ -41,7 +41,7 @@ void GameScene::Initialize() {
 	enemyBullet_ = new EnemyBullet;
 	boss_ = new Boss;
 	boss_->Initialize(model_);
-	bossBullet_ = new BossBullet;
+	//bossBullet_ = new BossBullet;
 	skydome_ = new Skydome;
 	railCamera_ = new RailCamera;
 	viewProjection_.Initialize();
@@ -91,9 +91,9 @@ void GameScene::Update()
 	}
 	boss_->Update();
 	// ボス弾更新
-	for (BossBullet* bullet : bossBullets_) {
-		    bullet->Update();
-	}
+	//for (BossBullet* bullet : bossBullets_) {
+	//	    bullet->Update();
+	//}
 
 	skydome_->Update();
 
@@ -162,10 +162,10 @@ void GameScene::Draw() {
 	}
 
 	boss_->Draw(viewProjection_);
-	// ボス弾更新
-	for (BossBullet* bullet : bossBullets_) {
-		bullet->Draw(viewProjection_);
-	}
+	//// ボス弾更新
+	//for (BossBullet* bullet : bossBullets_) {
+	//	bullet->Draw(viewProjection_);
+	//}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
