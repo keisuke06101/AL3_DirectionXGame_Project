@@ -2,7 +2,7 @@
 #include "Collider.h"
 #include "WorldTransform.h"
 #include "ImGuiManager.h"
-#include "BossBullet.h"
+#include "EnemyBullet.h"
 #include "MathUtility.h"
 #include "TimedCall.h"
 #include <cassert>
@@ -87,7 +87,7 @@ public:
 	// ゲッター
 	bool GetIsDead() const { return isDead_; };
 
-	private:
+private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 

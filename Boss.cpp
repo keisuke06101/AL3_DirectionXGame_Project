@@ -142,11 +142,11 @@ void Boss::Fire()
 		Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
 
 		// 弾を生成し、初期化
-		BossBullet* newBullet = new BossBullet();
+		EnemyBullet* newBullet = new EnemyBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
 		// 弾を登録する
-		gameScene_->AddBossBullet(newBullet);
+		gameScene_->AddEnemyBullet(newBullet);
 	}
 }
 

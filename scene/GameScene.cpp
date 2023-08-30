@@ -40,6 +40,7 @@ void GameScene::Initialize() {
 	playerBullet_ = new PlayerBullet;
 	enemyBullet_ = new EnemyBullet;
 	boss_ = new Boss;
+	boss_->Initialize(model_, {0.f, 5.f, 100.f});
 	bossBullet_ = new BossBullet;
 	skydome_ = new Skydome;
 	railCamera_ = new RailCamera;
