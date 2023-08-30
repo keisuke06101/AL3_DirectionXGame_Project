@@ -2,7 +2,7 @@
 #include "Collider.h"
 #include "WorldTransform.h"
 #include "ImGuiManager.h"
-#include "EnemyBullet.h"
+#include "BossBullet.h"
 #include "MathUtility.h"
 #include "TimedCall.h"
 #include <cassert>
@@ -12,8 +12,6 @@
 
 // 自機クラスの前方宣言
 class Player;
-// ゲームシーンクラスの前方宣言
-class GameScene;
 
 class Boss : public Collider {
 public:
@@ -22,7 +20,7 @@ public:
 	/// </summary>
 	///< param name = "model">モデル</param>
 	/// ///<param name = "textureHandle">テクスチャハンドル</param>
-	void Initialize(Model* model, const Vector3& pos);
+	void Initialize(Model* model);
 
 	/// <summary>
 	/// 更新
@@ -62,30 +60,10 @@ public:
 	// 発射間隔
 	static const int kFireInterval = 60;
 
-	// ワールド座標を取得
-	Vector3 GetWorldPosition() override;
-
-	// 衝撃を検出したら呼び出されるコールバック関数
-	void OnCollision() override;
-
-	// 弾リストを取得
-	// const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
-
-	const float GetRadius() { return radius_; }
-	const float radius_ = 1.0f;
-
-	/// <summary>
-	/// 弾を発射し、タイマーをリセットするコールバック関数
-	/// </summary>
-	void FireReset();
-
-	// セッター
 	void SetPlayer(Player* player) { player_ = player; }
 
-	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
-
-	// ゲッター
-	bool GetIsDead() const { return isDead_; };
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
 
 private:
 	// ワールド変換データ
@@ -106,24 +84,11 @@ private:
 	Phase phase_ = Phase::Approach;
 
 	// 弾
-	// std::list<EnemyBullet*> bullets_;
+	std::list<BossBullet*> bullets_;
 
 	// 発射タイマー
 	int32_t fireTimer = 0;
 
 	// 自キャラ
 	Player* player_ = nullptr;
-
-	// ゲームシーン
-	GameScene* gameScene_ = nullptr;
-
-	// 寿命<frm>
-	static const int32_t kLifeTime = 60 * 5;
-	// デスタイマー
-	int32_t deathTimer_ = kLifeTime;
-	// デスフラグ
-	bool isDead_ = false;
-
-	// 時限発動のリスト
-	std::list<TimedCall*> timedCalls_;
 };

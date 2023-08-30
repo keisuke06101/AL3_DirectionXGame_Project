@@ -138,7 +138,7 @@ private: // メンバ変数
 	EnemyBullet* enemyBullet_ = nullptr;
 
 	// ボスの弾
-	BossBullet* bossBullet_ = nullptr;
+	//BossBullet* bossBullet_ = nullptr;
 
 	// 天球
 	Skydome* skydome_ = nullptr;

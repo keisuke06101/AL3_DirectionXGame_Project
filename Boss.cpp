@@ -1,8 +1,7 @@
 ﻿#include "Boss.h"
 #include "Player.h"
-#include "GameScene.h"
 
-void Boss::Initialize(Model* model, const Vector3& pos)
+void Boss::Initialize(Model* model) 
 {
 	// NULLポイントチェック
 	assert(model);
@@ -15,51 +14,22 @@ void Boss::Initialize(Model* model, const Vector3& pos)
 	worldTransform_.Initialize();
 
 	// 位置の初期化
-	worldTransform_.translation_ = pos;
+	worldTransform_.translation_ = {0, 0, 100};
 
 	// 接近フェーズの初期化
 	phaseApproachInitialize();
-
-	// 衝突属性を設定
-	SetCA(kCollisionAttributeEnemy);
-	// 衝突対象を自分の属性以外に設定
-	SetCM(kCollisionAttributePlayer);
-}
-
-Boss::~Boss()
-{
-    // 範囲forでリストの全要素について回す
-	for (TimedCall* timedCall : timedCalls_) {
-		delete timedCall;
-	}
-}
-
-Vector3 Boss::GetWorldPosition() 
-{
-	// ワールド座標を入れる変数
-	Vector3 worldPos;
-	// ワールド行列の平行移動成分を取得（ワールド座標）
-	worldPos.x = worldTransform_.translation_.x;
-	worldPos.y = worldTransform_.translation_.y;
-	worldPos.z = worldTransform_.translation_.z;
-	return worldPos;
 }
 
 void Boss::Update()
 {
-	// 終了したタイマーの削除
-	timedCalls_.remove_if([](TimedCall* time) {
-		if (time->IsFinished()) {
-			delete time;
+	// デスフラグの立った弾を削除
+	bullets_.remove_if([](BossBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
 			return true;
 		}
 		return false;
 	});
-
-	// 範囲forでリストの全要素について回す
-	for (TimedCall* timedCall : timedCalls_) {
-		timedCall->Update();
-	}
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
@@ -77,34 +47,49 @@ void Boss::Update()
 		phaseLeave();
 		break;
 	}
-}
 
-void Boss::Draw(ViewProjection& viewProjection)
-{
-	// 敵の描画
-	if (!isDead_) {
-		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	// 弾更新
+	for (BossBullet* bullet : bullets_) {
+		bullet->Update();
 	}
 }
 
-void Boss::phaseApproachInitialize() 
+void Boss::Draw(ViewProjection& viewProjection) 
+{
+	// 敵の描画
+	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+	// 弾描画
+	for (BossBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
+}
+
+void Boss::phaseApproachInitialize()
 {
 	// 発射タイマーの初期化
 	fireTimer = kFireInterval;
-
-	// 発射タイマーをセットする
-	timedCalls_.push_back(new TimedCall(std::bind(&Boss::FireReset, this), fireTimer));
 }
 
-void Boss::phaseApproach() 
+void Boss::phaseApproach()
 {
 	// 接近フェーズスピード
 	const float kApproachSpeed = 0.2f;
 	// 移動ベクトル
 	worldTransform_.translation_.z -= kApproachSpeed;
 	// 既定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 30.0f) {
+	if (worldTransform_.translation_.z < 0.0f) {
 		phase_ = Phase::Leave;
+	}
+
+	// 発射タイマーカウントダウン
+	fireTimer--;
+	// 指定時間に達した
+	if (fireTimer <= 0) {
+		// 弾を発射
+		Fire();
+		// 発射タイマーを初期化
+		fireTimer = kFireInterval;
 	}
 }
 
@@ -114,49 +99,52 @@ void Boss::phaseLeave()
 	const float kLeaveSpeed = 0.2f;
 	// 移動ベクトル
 	worldTransform_.translation_.x += kLeaveSpeed;
-	// 時間経過で消える
-	if (--deathTimer_ <= 0) {
-		isDead_ = true;
-	}
-	timedCalls_.clear();
+	// worldTransform_.translation_.y += kLeaveSpeed;
+	// worldTransform_.translation_.z -= kLeaveSpeed;
 }
 
-void Boss::Fire()
+void Boss::Fire() 
 {
 	assert(player_);
-	if (!isDead_) {
-		// 弾の速度
-		const float kBulletSpeed = 1.0f;
 
-		// 自キャラのワールド座標を取得する
-		player_->GetWorldPosition();
-		// 敵キャラのワールド座標を取得する
-		GetWorldPosition();
-		// 敵キャラ->自キャラの差分ベクトル
-		Vector3 vec{
-		    player_->GetWorldPosition().x - GetWorldPosition().x,
-		    player_->GetWorldPosition().y - GetWorldPosition().y,
-		    player_->GetWorldPosition().z - GetWorldPosition().z};
-		float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-		Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
-		Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
+	// 弾の速度
+	const float kBulletSpeed = 1.0f;
 
-		// 弾を生成し、初期化
-		EnemyBullet* newBullet = new EnemyBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+	// 自キャラのワールド座標を取得する
+	player_->GetWorldPosition();
+	// 敵キャラのワールド座標を取得する
+	GetWorldPosition();
+	// 敵キャラ->自キャラの差分ベクトル
+	Vector3 vec{
+	    player_->GetWorldPosition().x - GetWorldPosition().x,
+	    player_->GetWorldPosition().y - GetWorldPosition().y,
+	    player_->GetWorldPosition().z - GetWorldPosition().z};
+	float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
+	Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
 
-		// 弾を登録する
-		gameScene_->AddEnemyBullet(newBullet);
+	// 弾を生成し、初期化
+	BossBullet* newBullet = new BossBullet();
+	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+
+	// 弾を登録する
+	bullets_.push_back(newBullet);
+}
+
+Boss::~Boss()
+{
+	for (BossBullet* bullet : bullets_) {
+		delete bullet;
 	}
 }
 
-void Boss::OnCollision() {}
-
-void Boss::FireReset() 
-{
-	// 弾を発射する
-	Fire();
-
-	// 発射タイマーをセットする
-	timedCalls_.push_back(new TimedCall(std::bind(&Boss::FireReset, this), kFireInterval));
+Vector3 Boss::GetWorldPosition() 
+{ 
+	// ワールド座標を入れる変数
+	Vector3 worldPos;
+	// ワールド行列の平行移動成分を取得（ワールド座標）
+	worldPos.x = worldTransform_.translation_.x;
+	worldPos.y = worldTransform_.translation_.y;
+	worldPos.z = worldTransform_.translation_.z;
+	return worldPos;
 }
