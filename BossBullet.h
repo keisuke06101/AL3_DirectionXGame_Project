@@ -27,6 +27,12 @@ public:
 
 	bool IsDead() const { return isDead_; }
 
+	// 衝撃を検出したら呼び出されるコールバック関数
+	void OnCollision() override;
+
+	const float GetRadius() { return radius_; }
+	const float radius_ = 1.0f;
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;

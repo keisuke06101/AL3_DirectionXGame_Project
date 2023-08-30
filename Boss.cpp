@@ -1,5 +1,6 @@
 ﻿#include "Boss.h"
 #include "Player.h"
+#include "GameScene.h"
 
 void Boss::Initialize(Model* model) 
 {
@@ -18,18 +19,28 @@ void Boss::Initialize(Model* model)
 
 	// 接近フェーズの初期化
 	phaseApproachInitialize();
+
+	// 衝突属性を設定
+	SetCA(kCollisionAttributeEnemy);
+	// 衝突対象を自分の属性以外に設定
+	SetCM(kCollisionAttributePlayer);
 }
 
 void Boss::Update()
 {
-	// デスフラグの立った弾を削除
-	bullets_.remove_if([](BossBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
+	// 終了したタイマーの削除
+	timedCalls_.remove_if([](TimedCall* time) {
+		if (time->IsFinished()) {
+			delete time;
 			return true;
 		}
 		return false;
 	});
+
+	// 範囲forでリストの全要素について回す
+	for (TimedCall* timedCall : timedCalls_) {
+		timedCall->Update();
+	}
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
@@ -47,28 +58,21 @@ void Boss::Update()
 		phaseLeave();
 		break;
 	}
-
-	// 弾更新
-	for (BossBullet* bullet : bullets_) {
-		bullet->Update();
-	}
 }
 
 void Boss::Draw(ViewProjection& viewProjection) 
 {
 	// 敵の描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
-	// 弾描画
-	for (BossBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}
 }
 
 void Boss::phaseApproachInitialize()
 {
 	// 発射タイマーの初期化
 	fireTimer = kFireInterval;
+
+	// 発射タイマーをセットする
+	timedCalls_.push_back(new TimedCall(std::bind(&Boss::FireReset, this), fireTimer));
 }
 
 void Boss::phaseApproach()
@@ -82,15 +86,15 @@ void Boss::phaseApproach()
 		phase_ = Phase::Leave;
 	}
 
-	// 発射タイマーカウントダウン
-	fireTimer--;
-	// 指定時間に達した
-	if (fireTimer <= 0) {
-		// 弾を発射
-		Fire();
-		// 発射タイマーを初期化
-		fireTimer = kFireInterval;
-	}
+	//// 発射タイマーカウントダウン
+	//fireTimer--;
+	//// 指定時間に達した
+	//if (fireTimer <= 0) {
+	//	// 弾を発射
+	//	Fire();
+	//	// 発射タイマーを初期化
+	//	fireTimer = kFireInterval;
+	//}
 }
 
 void Boss::phaseLeave()
@@ -99,8 +103,11 @@ void Boss::phaseLeave()
 	const float kLeaveSpeed = 0.2f;
 	// 移動ベクトル
 	worldTransform_.translation_.x += kLeaveSpeed;
-	// worldTransform_.translation_.y += kLeaveSpeed;
-	// worldTransform_.translation_.z -= kLeaveSpeed;
+	// 時間経過で消える
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
+	timedCalls_.clear();
 }
 
 void Boss::Fire() 
@@ -128,13 +135,14 @@ void Boss::Fire()
 	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
 	// 弾を登録する
-	bullets_.push_back(newBullet);
+	gameScene_->AddBossBullet(newBullet);
 }
 
 Boss::~Boss()
 {
-	for (BossBullet* bullet : bullets_) {
-		delete bullet;
+	// 範囲forでリストの全要素について回す
+	for (TimedCall* timedCall : timedCalls_) {
+		delete timedCall;
 	}
 }
 
@@ -147,4 +155,15 @@ Vector3 Boss::GetWorldPosition()
 	worldPos.y = worldTransform_.translation_.y;
 	worldPos.z = worldTransform_.translation_.z;
 	return worldPos;
+}
+
+void Boss::OnCollision() {}
+
+void Boss::FireReset() 
+{
+	// 弾を発射する
+	Fire();
+
+	// 発射タイマーをセットする
+	timedCalls_.push_back(new TimedCall(std::bind(&Boss::FireReset, this), kFireInterval));
 }
