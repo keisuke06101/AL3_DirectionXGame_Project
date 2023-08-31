@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	///< param name = "model">モデル</param>
 	/// ///<param name = "textureHandle">テクスチャハンドル</param>
-	void Initialize(Model* model);
+	void Initialize(Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -73,7 +73,9 @@ public:
 	// const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
 
 	const float GetRadius() { return radius_; }
-	const float radius_ = 1.0f;
+	const float radius_ = 0.1f;
+
+	bool GetIsDead() const { return isDead_; };
 
 	/// <summary>
 	/// 弾を発射し、タイマーをリセットするコールバック関数
@@ -87,12 +89,16 @@ public:
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	WorldTransform worldTransformW_;
 
 	// モデル
 	Model* model_ = nullptr;
+	// ボスの弱点モデル
+	Model* modelW_ = nullptr;
 
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+	uint32_t textureHandleW_ = 0u;
 
 	// 行動フェーズ
 	enum class Phase {
@@ -103,7 +109,7 @@ private:
 	Phase phase_ = Phase::Approach;
 
 	// 弾
-	std::list<BossBullet*> bullets_;
+	//std::list<BossBullet*> bullets_;
 
 	// 発射タイマー
 	int32_t fireTimer = 0;
@@ -121,6 +127,19 @@ private:
 	// デスフラグ
 	bool isDead_ = false;
 
+	// キャラクターの移動ベクトル
+	Vector3 move = {0.2f, -0.1f, 0.f};
+
 	// 時限発動のリスト
 	std::list<TimedCall*> timedCalls_;
+
+	// シェイク演出用変数
+	int shakeTimer_ = 0;
+	bool isRand_ = 0;
+	bool isRandP_ = 0;
+
+	int randX_ = 0;
+	int randY_ = 0;
+	int randZ_ = 0;
+	int i_ = 21;
 };

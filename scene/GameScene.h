@@ -81,6 +81,8 @@ public: // メンバ関数
 	/// <param name="bossBullet"></param>
 	void AddBossBullet(BossBullet* bossBullet);
 
+	void AddBoss(Vector3 pos);
+
 	/// <summary>
 	/// 敵発生のデータ読み込み
 	/// </summary>
@@ -90,6 +92,20 @@ public: // メンバ関数
 	/// 敵発生コマンドの更新
 	/// </summary>
 	void UpdateEnemyPopCommands();
+
+	/// <summary>
+	/// 敵発生のデータ読み込み
+	/// </summary>
+	void LoadBossPopData();
+
+	/// <summary>
+	/// 敵発生コマンドの更新
+	/// </summary>
+	void UpdateBossPopCommands();
+
+	// ゲッター
+	bool GetIsGameOver() const { return isGameOver_; };
+
 
 private: // メンバ変数
 
@@ -129,7 +145,7 @@ private: // メンバ変数
 	std::list<Enemy*> enemy_;
 
 	// ボス
-	Boss* boss_ = nullptr;
+	std::list<Boss*> boss_;
 
 	// プレイヤーの弾
 	PlayerBullet* playerBullet_ = nullptr;
@@ -156,8 +172,16 @@ private: // メンバ変数
 
 	// 敵発生コマンド
 	std::stringstream enemyPopCommands;
+
+	std::stringstream bossPopCommands;
+
 	bool isWait = 0;
 	int waitTimer;
+
+	bool isWaitB = 0;
+	int waitTimerB;
+
+	bool isGameOver_ = 0;
 
 	/// <summary>
 	/// コライダー２つの衝突判定と応答

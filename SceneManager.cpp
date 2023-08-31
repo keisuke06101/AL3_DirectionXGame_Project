@@ -34,6 +34,10 @@ void SceneManager::Update()
 	case Game:
 		
 		gameScene_->Update();
+		if (gameScene_->GetIsGameOver() == true)
+		{
+			sceneNo_ = GameOver;
+		}
 
 		break;
 	case GameClear:
@@ -41,6 +45,11 @@ void SceneManager::Update()
 		break;
 	case GameOver:
 		
+		if (input_->PushKey(DIK_BACKSPACE)) {
+			sceneNo_ = Game;
+			Initialize();
+		}
+
 		break;
 	default:
 		break;

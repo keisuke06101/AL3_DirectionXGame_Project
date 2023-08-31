@@ -27,6 +27,9 @@ public:
 
 	bool IsDead() const { return isDead_; }
 
+	// ワールド座標を取得
+	Vector3 GetWorldPosition() override;
+
 	// 衝撃を検出したら呼び出されるコールバック関数
 	void OnCollision() override;
 

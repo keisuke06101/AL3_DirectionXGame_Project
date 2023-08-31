@@ -139,21 +139,21 @@ void Player::Update(ViewProjection& viewProjection)
 	const float kCharcterSpeed = 0.2f;
 
 	//押した方向で移動ベクトルを変更(左右)
-	if (input_->PushKey(DIK_LEFT))
+	if (input_->PushKey(DIK_A))
 	{
 		move.x -= kCharcterSpeed;
 	}
-	else if (input_->PushKey(DIK_RIGHT))
+	else if (input_->PushKey(DIK_D))
 	{
 		move.x += kCharcterSpeed;
 	}
 
 	// 押した方向で移動ベクトルを変更(上下)
-	if (input_->PushKey(DIK_UP)) 
+	if (input_->PushKey(DIK_W)) 
 	{
 		move.y += kCharcterSpeed;
 	}
-	else if (input_->PushKey(DIK_DOWN))
+	else if (input_->PushKey(DIK_S))
 	{
 		move.y -= kCharcterSpeed;
 	}
@@ -220,8 +220,14 @@ void Player::Update(ViewProjection& viewProjection)
 			worldTransform_.rotation_.y = 0;
 			worldTransform_.rotation_.z = 0;
 			i_ = 21;
+			playerLife_ -= 1;
 			isRand_ = false;
 		}
+	}
+
+	if (playerLife_ == 0)
+	{
+		isDead_ = true;
 	}
 
 }
@@ -231,7 +237,7 @@ void Player::Attack()
 	if (input_->TriggerKey(DIK_SPACE))
 	{
 		//弾の速度
-		const float kBulletSpeed = 1.0f;
+		const float kBulletSpeed = 2.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
 
 		//速度ベクトルを自機の向きに合わせて回転させる
@@ -254,12 +260,12 @@ void Player::Rotate()
 { 
 	const float kRotSpeed = 0.02f;
 
-	if (input_->PushKey(DIK_A))
+	if (input_->PushKey(DIK_LEFT))
 	{
 		worldTransform_.rotation_.y -= kRotSpeed;
 	}
 
-	if (input_->PushKey(DIK_D)) {
+	if (input_->PushKey(DIK_RIGHT)) {
 		worldTransform_.rotation_.y += kRotSpeed;
 	}
 
@@ -309,19 +315,20 @@ void Player::SetParent(const WorldTransform* parent)
 void Player::Draw(ViewProjection& viewProjection)
  {
 
-	//自キャラの描画
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
-	// 3Dレティクルの描画
-	//modelReticle_->Draw(worldTransform3DReticle_, viewProjection);
-
-	//弾描画
-	for (PlayerBullet* bullet : bullets_)
+	if (!isDead_)
 	{
-		bullet->Draw(viewProjection);
+		// 自キャラの描画
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+		// 3Dレティクルの描画
+		// modelReticle_->Draw(worldTransform3DReticle_, viewProjection);
+
+		// 弾描画
+		for (PlayerBullet* bullet : bullets_) {
+			bullet->Draw(viewProjection);
+		}
 	}
 
-	
 }
 
 void Player::DrawUI() 

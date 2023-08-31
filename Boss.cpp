@@ -2,20 +2,26 @@
 #include "Player.h"
 #include "GameScene.h"
 
-void Boss::Initialize(Model* model) 
-{
+void Boss::Initialize(Model* model, const Vector3& pos) {
 	// NULLポイントチェック
 	assert(model);
 
 	// 受け渡し
 	model_ = model;
+	modelW_ = model;
 	textureHandle_ = TextureManager::Load("nu.png");
+	textureHandleW_ = TextureManager::Load("0.png");
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
+	worldTransformW_.Initialize();
+
+	// スケールの初期化
+	//worldTransform_.scale_ = {6, 6, 1};
 
 	// 位置の初期化
-	worldTransform_.translation_ = {0, 0, 100};
+	worldTransform_.translation_ = pos;
+	worldTransformW_.translation_ = {0, 0, worldTransform_.translation_.z};
 
 	// 接近フェーズの初期化
 	phaseApproachInitialize();
@@ -45,8 +51,14 @@ void Boss::Update()
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
+	/*worldTransformW_.matWorld_ = MakeAffineMatrix(
+	    worldTransformW_.scale_, worldTransformW_.rotation_, worldTransformW_.translation_);*/
+
 	// 行列を定数バッファーに転送
 	worldTransform_.TransferMatrix();
+
+	//// 行列を定数バッファーに転送
+	//worldTransformW_.TransferMatrix();
 
 	switch (phase_) {
 	case Phase::Approach:
@@ -58,12 +70,40 @@ void Boss::Update()
 		phaseLeave();
 		break;
 	}
+
+	// シェイク
+	if (isRand_) {
+		shakeTimer_ += 1;
+	}
+	if (shakeTimer_ == 2) {
+		randX_ = rand() % i_ - 3;
+		randY_ = rand() % i_ - 3;
+		randZ_ = rand() % i_ - 3;
+		worldTransform_.rotation_.x += randX_;
+		worldTransform_.rotation_.y -= randY_;
+		worldTransform_.rotation_.z -= randZ_;
+		i_--;
+		shakeTimer_ = 0;
+
+		if (i_ == 0) {
+			randX_ = 0;
+			randY_ = 0;
+			worldTransform_.rotation_.x = 0;
+			worldTransform_.rotation_.y = 0;
+			worldTransform_.rotation_.z = 0;
+			i_ = 21;
+			isRand_ = false;
+		}
+	}
 }
 
 void Boss::Draw(ViewProjection& viewProjection) 
 {
+	//// ボスの弱点
+	//modelW_->Draw(worldTransformW_, viewProjection, textureHandleW_);
 	// 敵の描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
 }
 
 void Boss::phaseApproachInitialize()
@@ -81,20 +121,37 @@ void Boss::phaseApproach()
 	const float kApproachSpeed = 0.2f;
 	// 移動ベクトル
 	worldTransform_.translation_.z -= kApproachSpeed;
+	//aaworldTransformW_.translation_.z -= kApproachSpeed;
 	// 既定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 0.0f) {
-		phase_ = Phase::Leave;
+	if (worldTransform_.translation_.z < 30.0f) {
+		//phase_ = Phase::Leave;
+		worldTransform_.translation_.z = 30.0f;
+		worldTransformW_.translation_.z = worldTransform_.translation_.z - 3;
+
 	}
 
-	//// 発射タイマーカウントダウン
-	//fireTimer--;
-	//// 指定時間に達した
-	//if (fireTimer <= 0) {
-	//	// 弾を発射
-	//	Fire();
-	//	// 発射タイマーを初期化
-	//	fireTimer = kFireInterval;
-	//}
+	// 範囲制限
+	const float kMoveLimitX = 10.0f;
+	const float kMoveLimitY = 10.0f;
+
+	// 範囲を超えない処理
+	worldTransformW_.translation_.x = max(worldTransformW_.translation_.x, -kMoveLimitX);
+	worldTransformW_.translation_.x = min(worldTransformW_.translation_.x, +kMoveLimitX);
+	worldTransformW_.translation_.y = max(worldTransformW_.translation_.y, -kMoveLimitY);
+	worldTransformW_.translation_.y = min(worldTransformW_.translation_.y, +kMoveLimitY);
+
+	if (worldTransformW_.translation_.x >= kMoveLimitX || worldTransformW_.translation_.x <= -kMoveLimitX)
+	{
+		move.x *= -1;
+	}
+	if (worldTransformW_.translation_.y >= kMoveLimitY || worldTransformW_.translation_.y <= -kMoveLimitY)
+	{
+		move.y *= -1;
+	}
+	// 座標移動（ベクトルの加算）
+	worldTransformW_.translation_.x += move.x;
+	worldTransformW_.translation_.y += move.y;
+
 }
 
 void Boss::phaseLeave()
@@ -157,7 +214,11 @@ Vector3 Boss::GetWorldPosition()
 	return worldPos;
 }
 
-void Boss::OnCollision() {}
+void Boss::OnCollision() 
+{
+	isDead_ = true;
+	//isDead_ = true;
+}
 
 void Boss::FireReset() 
 {

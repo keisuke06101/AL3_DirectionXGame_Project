@@ -10,7 +10,6 @@ GameScene::~GameScene()
 	delete debugCamera_;
 	delete model_;
 	delete player_;
-	delete boss_;
 	delete skydome_;
 	delete modelSkydome_;
 	delete railCamera_;
@@ -20,6 +19,9 @@ GameScene::~GameScene()
 	}
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
+	}
+	for (Boss* boss : boss_) {
+		delete boss;
 	}
 	for (BossBullet* bullet : bossBullets_) {
 		delete bullet;
@@ -39,8 +41,6 @@ void GameScene::Initialize() {
 	player_ = new Player;
 	playerBullet_ = new PlayerBullet;
 	enemyBullet_ = new EnemyBullet;
-	boss_ = new Boss;
-	boss_->Initialize(model_);
 	bossBullet_ = new BossBullet;
 	skydome_ = new Skydome;
 	railCamera_ = new RailCamera;
@@ -59,11 +59,13 @@ void GameScene::Initialize() {
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_->Initialize(modelSkydome_);
 
-	// 敵キャラに自キャラのアドレスを渡す
-	boss_->SetPlayer(player_);
+	//// 敵キャラに自キャラのアドレスを渡す
+	//boss_->SetPlayer(player_);
 
 	AddEnemy({0.f, 5.f, 100.f});
+	AddBoss({0.f, 0.f, 100.f});
 	LoadEnemyPopData();
+	LoadBossPopData();
 }
 
 void GameScene::Update() 
@@ -83,16 +85,29 @@ void GameScene::Update()
 		}
 		return false;
 	});
+
+	// デスフラグの立ったボス弾を削除
+	bossBullets_.remove_if([](BossBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
 	UpdateEnemyPopCommands();
+	UpdateBossPopCommands();
 	player_->Update(viewProjection_);
-	/*for (Enemy* enemy : enemy_) {
+	for (Enemy* enemy : enemy_) {
 	        enemy->Update();
-	}*/
-	// 弾更新
-	for (EnemyBullet* bullet : enemyBullets_) {
-		    bullet->Update();
 	}
-	boss_->Update();
+	// 弾更新
+	/*for (EnemyBullet* bullet : enemyBullets_) {
+		    bullet->Update();
+	}*/
+	for (Boss* boss : boss_) {
+		    boss->Update();
+	}
 	// ボス弾更新
 	for (BossBullet* bullet : bossBullets_) {
 		    bullet->Update();
@@ -119,6 +134,10 @@ void GameScene::Update()
 		viewProjection_.TransferMatrix();
 	}
 	CheckAllCollisions();
+
+	if (player_->GetIsDead() == true) {
+		isGameOver_ = true;
+	}
 
 }
 
@@ -157,14 +176,15 @@ void GameScene::Draw() {
 	for (Enemy* enemy : enemy_) {
 		enemy->Draw(viewProjection_);
 	}
-	skydome_->Draw(viewProjection_);
-	
 	// 弾描画
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Draw(viewProjection_);
 	}
+	skydome_->Draw(viewProjection_);
 
-	boss_->Draw(viewProjection_);
+	for (Boss* boss : boss_) {
+		boss->Draw(viewProjection_);
+	}
 	//// ボス弾更新
 	for (BossBullet* bullet : bossBullets_) {
 		bullet->Draw(viewProjection_);
@@ -255,6 +275,9 @@ void GameScene::CheckAllCollisions()
 	for (Enemy* enemy : enemy_) {
 		colliders_.push_back(enemy);
 	}
+	for (Boss* boss : boss_) {
+	    colliders_.push_back(boss);
+	}
 	// 自弾すべてについて
 	for (PlayerBullet* pBullet : playerBullets) {
 		colliders_.push_back(pBullet);
@@ -312,6 +335,18 @@ void GameScene::AddBossBullet(BossBullet* bossBullet)
 {
 	// リストに登録する
 	bossBullets_.push_back(bossBullet);
+}
+
+void GameScene::AddBoss(Vector3 pos) {
+	Boss* obj = new Boss;
+	// 敵
+	obj->Initialize(model_, pos);
+	// 敵キャラに自キャラのアドレスを渡す
+	obj->SetPlayer(player_);
+	// 敵キャラにゲームシーンを渡す
+	obj->SetGameScene(this);
+
+	boss_.push_back(obj);
 }
 
 void GameScene::LoadEnemyPopData() {
@@ -386,6 +421,84 @@ void GameScene::UpdateEnemyPopCommands()
 			// 待機開始
 			isWait = true;
 			waitTimer = waitTime;
+
+			// コマンドループを抜ける
+			break;
+		}
+	}
+}
+
+void GameScene::LoadBossPopData()
+{
+	// ファイルを開く
+	std::ifstream file;
+	file.open("./Resources/bossPop.csv");
+	assert(file.is_open());
+
+	// ファイルの内容を文字列ストリームにコピー
+	bossPopCommands << file.rdbuf();
+
+	// ファイルを閉じる
+	file.close();
+}
+
+void GameScene::UpdateBossPopCommands()
+{
+	// 待機処理
+	if (isWaitB) {
+		waitTimerB--;
+		if (waitTimerB <= 0) {
+			// 待機完了
+			isWaitB = false;
+		}
+		return;
+	}
+
+	// 1行分の文字列を入れる変数
+	std::string line;
+
+	// コマンド実行ループ
+	while (getline(bossPopCommands, line)) {
+		// 1行分の文字列をストr－無に変換して解析しやすくする
+		std::istringstream line_stream(line);
+
+		std::string word;
+		// ,区切りで行の先頭文字列を取得
+		getline(line_stream, word, ',');
+
+		// *//*から始まる行はコメント
+		if (word.find("//") == 0) {
+			// コメント行を伸ばす
+			continue;
+		}
+
+		// POPコマンド
+		if (word.find("POP") == 0) {
+
+			// x座標
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+			// y座標
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+			// z座標
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			// 敵を発生させる
+			AddBoss(Vector3(x, y, z));
+		}
+
+		// WAITコマンド
+		else if (word.find("WAIT") == 0) {
+			getline(line_stream, word, ',');
+
+			// 待ち時間
+			int32_t waitTime = atoi(word.c_str());
+
+			// 待機開始
+			isWaitB = true;
+			waitTimerB = waitTime;
 
 			// コマンドループを抜ける
 			break;

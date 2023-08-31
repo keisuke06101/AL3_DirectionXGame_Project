@@ -74,6 +74,9 @@ public:
 	// 衝突時に呼ばれる関数
 	//void OnCollision() override;
 
+	// ゲッター
+	bool GetIsDead() const { return isDead_; };
+
 private:
 
 	// ワールド変換データ
@@ -110,5 +113,7 @@ private:
 	int i_ = 21;
 
 	bool isDead_ = 0;
+
+	int playerLife_ = 500;
 
 };
