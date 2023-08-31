@@ -96,6 +96,12 @@ private:
 	uint32_t textureHandle_ = 0u;
 	uint32_t tectureHandleR_ = 0u;
 
+	uint32_t iconTexture_ = 0u;
+	Sprite* spriteIcon_ = nullptr;
+
+	uint32_t lifeTexture_ = 0u;
+	Sprite* spriteLife_ = nullptr;
+
 	//キーボード入力
 	Input* input_ = nullptr;
 
@@ -114,6 +120,6 @@ private:
 
 	bool isDead_ = 0;
 
-	int playerLife_ = 500;
+	int playerLife_ = 5;
 
 };

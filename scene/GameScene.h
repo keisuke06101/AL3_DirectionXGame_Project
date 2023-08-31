@@ -52,6 +52,12 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	void TitleDraw();
+
+	void GameOverDraw();
+
+	void GameClearDraw();
+
 	/// <summary>
 	/// 操作説明表示処理
 	/// </summary>
@@ -105,7 +111,7 @@ public: // メンバ関数
 
 	// ゲッター
 	bool GetIsGameOver() const { return isGameOver_; };
-
+	bool GetIsGameClear() const { return isGameClear_; };
 
 private: // メンバ変数
 
@@ -120,6 +126,18 @@ private: // メンバ変数
 	uint32_t textureHandle_ = 0;
 	uint32_t enemyTextureHandle_ = 0;
 	uint32_t textureHandleE_ = 0;
+
+	uint32_t titleTexture_ = 0u;
+	Sprite* spriteTitle_ = nullptr;
+
+	uint32_t gameOverTexture_ = 0u;
+	Sprite* spriteGameOver_ = nullptr;
+
+	uint32_t gameClearTexture_ = 0u;
+	Sprite* spriteGameClear_ = nullptr;
+
+	uint32_t explanationTexture_ = 0u;
+	Sprite* spriteExplanation_ = nullptr;
 
 	Model* model_ = nullptr;
 
@@ -182,6 +200,9 @@ private: // メンバ変数
 	int waitTimerB;
 
 	bool isGameOver_ = 0;
+	bool isGameClear_ = 0;
+
+	int bossPopTimer_ = 960;
 
 	/// <summary>
 	/// コライダー２つの衝突判定と応答

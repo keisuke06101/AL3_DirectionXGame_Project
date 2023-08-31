@@ -22,11 +22,11 @@ void Explanation::Initialize(Model* model, uint32_t textureHandle, Vector3 posit
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 
-
 }
 
 void Explanation::Update() { 
 
+	/*#ifdef _DEBUG
 	ImGui::Begin("Explanation"); 
 	float sliderValue[3] = {
 	    worldTransform_.translation_.x, worldTransform_.translation_.y,
@@ -34,6 +34,7 @@ void Explanation::Update() {
 	ImGui::SliderFloat3("position", sliderValue, -100.0f, 20.0f);
 	worldTransform_.translation_ = {sliderValue[0], sliderValue[1], sliderValue[2]};
 	ImGui::End();
+	#endif*/
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);

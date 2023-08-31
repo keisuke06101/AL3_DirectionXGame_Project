@@ -22,6 +22,12 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 playerPosi
 
 	// レティクル用テクスチャ取得
 	uint32_t textureReticle = TextureManager::Load("target.png");
+	
+	lifeTexture_ = TextureManager::Load("5.png");
+	spriteLife_ = Sprite::Create(lifeTexture_, {200, 630}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
+	iconTexture_ = TextureManager::Load("icon.png");
+	spriteIcon_ = Sprite::Create(iconTexture_, {100, 630}, {1, 1, 1, 1}, {0.5f, 0.5f});
 
 	// スプライト生成
 	sprite2DReticle_ = Sprite::Create(
@@ -123,6 +129,7 @@ void Player::Update(ViewProjection& viewProjection)
 	worldTransform3DReticle_.UpdateMatrix();
 
 	// デバック文字表示
+    /*#ifdef _DEBUG
 	ImGui::Begin("Player");
 	ImGui::Text("2DReticle:(%f, %f)", mousePosition.x, mousePosition.y);
 	ImGui::Text("Near:(%+.2f, %+.2f, %+.2f)", posNear.x, posNear.y, posNear.z);
@@ -131,6 +138,7 @@ void Player::Update(ViewProjection& viewProjection)
 	                                               worldTransform3DReticle_.translation_.y,
 	                                               worldTransform3DReticle_.translation_.z);
 	ImGui::End();
+	#endif*/
 
 	//キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
@@ -159,8 +167,8 @@ void Player::Update(ViewProjection& viewProjection)
 	}
 
 	//範囲制限
-	const float kMoveLimitX = 20.0f;
-	const float kMoveLimitY = 20.0f;
+	const float kMoveLimitX = 14.0f;
+	const float kMoveLimitY = 7.0f;
 
 	//座標移動（ベクトルの加算）
 	worldTransform_.translation_.x += move.x;
@@ -185,13 +193,13 @@ void Player::Update(ViewProjection& viewProjection)
 	worldTransform_.UpdateMatrix();
 
 	// キャラクターの座標を画面表示する処理
-	ImGui::Begin("Player");
+	/*ImGui::Begin("Player");
 	float sliderValue[3] = {
 	    worldTransform_.translation_.x, worldTransform_.translation_.y,
 	    worldTransform_.translation_.z};
 	ImGui::SliderFloat3("position", sliderValue, -20.0f, 20.0f);
 	worldTransform_.translation_ = {sliderValue[0], sliderValue[1], sliderValue[2]};
-	ImGui::End();
+	ImGui::End();*/
 
 	//弾更新
 	for (PlayerBullet* bullet : bullets_)
@@ -234,7 +242,7 @@ void Player::Update(ViewProjection& viewProjection)
 
 void Player::Attack()
 { 
-	if (input_->TriggerKey(DIK_SPACE))
+	if (input_->IsTriggerMouse(0))
 	{
 		//弾の速度
 		const float kBulletSpeed = 2.0f;
@@ -332,5 +340,25 @@ void Player::Draw(ViewProjection& viewProjection)
 }
 
 void Player::DrawUI() 
-{ sprite2DReticle_->Draw(); }
+{
+	sprite2DReticle_->Draw();
+	if (playerLife_ == 4) {
+		lifeTexture_ = TextureManager::Load("4.png");
+		spriteLife_ = Sprite::Create(lifeTexture_, {200, 630}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	}
+	if (playerLife_ == 3) {
+		lifeTexture_ = TextureManager::Load("3.png");
+		spriteLife_ = Sprite::Create(lifeTexture_, {200, 630}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	}
+	if (playerLife_ == 2) {
+		lifeTexture_ = TextureManager::Load("2.png");
+		spriteLife_ = Sprite::Create(lifeTexture_, {200, 630}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	}
+	if (playerLife_ == 1) {
+		lifeTexture_ = TextureManager::Load("1.png");
+		spriteLife_ = Sprite::Create(lifeTexture_, {200, 630}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	}
+	spriteLife_->Draw();
+	spriteIcon_->Draw();
+}
 

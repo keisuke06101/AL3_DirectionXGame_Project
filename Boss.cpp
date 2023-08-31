@@ -9,7 +9,7 @@ void Boss::Initialize(Model* model, const Vector3& pos) {
 	// 受け渡し
 	model_ = model;
 	modelW_ = model;
-	textureHandle_ = TextureManager::Load("nu.png");
+	textureHandle_ = TextureManager::Load("boss.png");
 	textureHandleW_ = TextureManager::Load("0.png");
 
 	// ワールド変換の初期化
@@ -17,7 +17,7 @@ void Boss::Initialize(Model* model, const Vector3& pos) {
 	worldTransformW_.Initialize();
 
 	// スケールの初期化
-	//worldTransform_.scale_ = {6, 6, 1};
+	worldTransform_.scale_ = {9, 9, 1};
 
 	// 位置の初期化
 	worldTransform_.translation_ = pos;
@@ -66,8 +66,8 @@ void Boss::Update()
 		phaseApproach();
 		break;
 
-	case Phase::Leave:
-		phaseLeave();
+	case Phase::phase2:
+		phase2();
 		break;
 	}
 
@@ -92,18 +92,32 @@ void Boss::Update()
 			worldTransform_.rotation_.y = 0;
 			worldTransform_.rotation_.z = 0;
 			i_ = 21;
+			bossLife_ -= 2;
 			isRand_ = false;
 		}
 	}
+
+	if (bossLife_ <= 0) {
+		worldTransform_.scale_.x -= 1;
+		worldTransform_.scale_.y -= 1;
+		worldTransform_.scale_.z -= 0.1f;
+		if (worldTransform_.scale_.x <= 0 && worldTransform_.scale_.y <= 0 && worldTransform_.scale_.z <= 0)
+		{
+		    isDead_ = true;
+		}
+	}
+
 }
 
 void Boss::Draw(ViewProjection& viewProjection) 
 {
 	//// ボスの弱点
 	//modelW_->Draw(worldTransformW_, viewProjection, textureHandleW_);
-	// 敵の描画
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
+	if (!isDead_)
+	{
+		// 敵の描画
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	}
 }
 
 void Boss::phaseApproachInitialize()
@@ -123,76 +137,72 @@ void Boss::phaseApproach()
 	worldTransform_.translation_.z -= kApproachSpeed;
 	//aaworldTransformW_.translation_.z -= kApproachSpeed;
 	// 既定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 30.0f) {
+	if (worldTransform_.translation_.z < 50.0f) {
 		//phase_ = Phase::Leave;
-		worldTransform_.translation_.z = 30.0f;
+		worldTransform_.translation_.z = 50.0f;
 		worldTransformW_.translation_.z = worldTransform_.translation_.z - 3;
-
+		if (bossLife_ <= 20)
+		{
+			phase_ = Phase::phase2;
+		}
+		
 	}
 
+}
+
+void Boss::phase2()
+{
 	// 範囲制限
 	const float kMoveLimitX = 10.0f;
 	const float kMoveLimitY = 10.0f;
 
 	// 範囲を超えない処理
-	worldTransformW_.translation_.x = max(worldTransformW_.translation_.x, -kMoveLimitX);
-	worldTransformW_.translation_.x = min(worldTransformW_.translation_.x, +kMoveLimitX);
-	worldTransformW_.translation_.y = max(worldTransformW_.translation_.y, -kMoveLimitY);
-	worldTransformW_.translation_.y = min(worldTransformW_.translation_.y, +kMoveLimitY);
+	worldTransform_.translation_.x = max(worldTransform_.translation_.x, -kMoveLimitX);
+	worldTransform_.translation_.x = min(worldTransform_.translation_.x, +kMoveLimitX);
+	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
+	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 
-	if (worldTransformW_.translation_.x >= kMoveLimitX || worldTransformW_.translation_.x <= -kMoveLimitX)
-	{
+	if (worldTransform_.translation_.x >= kMoveLimitX ||
+	    worldTransform_.translation_.x <= -kMoveLimitX) {
 		move.x *= -1;
 	}
-	if (worldTransformW_.translation_.y >= kMoveLimitY || worldTransformW_.translation_.y <= -kMoveLimitY)
-	{
+	if (worldTransform_.translation_.y >= kMoveLimitY ||
+	    worldTransform_.translation_.y <= -kMoveLimitY) {
 		move.y *= -1;
 	}
 	// 座標移動（ベクトルの加算）
-	worldTransformW_.translation_.x += move.x;
-	worldTransformW_.translation_.y += move.y;
-
-}
-
-void Boss::phaseLeave()
-{
-	// 離脱フェーズスピード
-	const float kLeaveSpeed = 0.2f;
-	// 移動ベクトル
-	worldTransform_.translation_.x += kLeaveSpeed;
-	// 時間経過で消える
-	if (--deathTimer_ <= 0) {
-		isDead_ = true;
-	}
-	timedCalls_.clear();
+	worldTransform_.translation_.x += move.x;
+	worldTransform_.translation_.y += move.y;
+	//timedCalls_.clear();
 }
 
 void Boss::Fire() 
 {
 	assert(player_);
+	if (!isDead_) {
+		// 弾の速度
+		const float kBulletSpeed = 1.0f;
 
-	// 弾の速度
-	const float kBulletSpeed = 1.0f;
+		// 自キャラのワールド座標を取得する
+		player_->GetWorldPosition();
+		// 敵キャラのワールド座標を取得する
+		GetWorldPosition();
+		// 敵キャラ->自キャラの差分ベクトル
+		Vector3 vec{
+		    player_->GetWorldPosition().x - GetWorldPosition().x,
+		    player_->GetWorldPosition().y - GetWorldPosition().y,
+		    player_->GetWorldPosition().z - GetWorldPosition().z};
+		float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+		Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
+		Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
 
-	// 自キャラのワールド座標を取得する
-	player_->GetWorldPosition();
-	// 敵キャラのワールド座標を取得する
-	GetWorldPosition();
-	// 敵キャラ->自キャラの差分ベクトル
-	Vector3 vec{
-	    player_->GetWorldPosition().x - GetWorldPosition().x,
-	    player_->GetWorldPosition().y - GetWorldPosition().y,
-	    player_->GetWorldPosition().z - GetWorldPosition().z};
-	float length = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-	Vector3 dir = {vec.x / length, vec.y / length, vec.z / length};
-	Vector3 velocity = {dir.x * kBulletSpeed, dir.y * kBulletSpeed, dir.z * kBulletSpeed};
+		// 弾を生成し、初期化
+		BossBullet* newBullet = new BossBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
-	// 弾を生成し、初期化
-	BossBullet* newBullet = new BossBullet();
-	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
-
-	// 弾を登録する
-	gameScene_->AddBossBullet(newBullet);
+		// 弾を登録する
+		gameScene_->AddBossBullet(newBullet);
+	}
 }
 
 Boss::~Boss()
@@ -216,7 +226,7 @@ Vector3 Boss::GetWorldPosition()
 
 void Boss::OnCollision() 
 {
-	isDead_ = true;
+	isRand_ = true;
 	//isDead_ = true;
 }
 

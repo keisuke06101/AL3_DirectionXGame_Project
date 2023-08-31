@@ -129,7 +129,7 @@ void Enemy::phaseApproach()
 	// 移動ベクトル
 	worldTransform_.translation_.z -= kApproachSpeed;
 	// 既定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 30.0f) {
+	if (worldTransform_.translation_.z < 50.0f) {
 		phase_ = Phase::Leave;
 	}
 

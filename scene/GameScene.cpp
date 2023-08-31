@@ -33,9 +33,18 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	textureHandle_ = TextureManager::Load("sample.png");
+	textureHandle_ = TextureManager::Load("machineA.png");
 	enemyTextureHandle_ = TextureManager::Load("obake1.png");
-	textureHandleE_ = TextureManager::Load("nu.png");
+	textureHandleE_ = TextureManager::Load("explanation.png");
+
+	titleTexture_ = TextureManager::Load("TitleScene.png");
+	gameClearTexture_ = TextureManager::Load("GameClear.png");
+	gameOverTexture_ = TextureManager::Load("GameOver.png");
+
+	spriteTitle_ = Sprite::Create(titleTexture_, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	spriteGameClear_ = Sprite::Create(gameClearTexture_, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	spriteGameOver_ = Sprite::Create(gameOverTexture_, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
 	model_ = Model::Create();
 	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
 	player_ = new Player;
@@ -58,6 +67,7 @@ void GameScene::Initialize() {
 	// 3Dモデルの生成
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_->Initialize(modelSkydome_);
+
 
 	//// 敵キャラに自キャラのアドレスを渡す
 	//boss_->SetPlayer(player_);
@@ -102,15 +112,22 @@ void GameScene::Update()
 	        enemy->Update();
 	}
 	// 弾更新
-	/*for (EnemyBullet* bullet : enemyBullets_) {
+	for (EnemyBullet* bullet : enemyBullets_) {
 		    bullet->Update();
-	}*/
-	for (Boss* boss : boss_) {
-		    boss->Update();
 	}
-	// ボス弾更新
-	for (BossBullet* bullet : bossBullets_) {
-		    bullet->Update();
+	bossPopTimer_ -= 1;
+	if (bossPopTimer_ <= 0)
+	{
+		    for (Boss* boss : boss_) {
+			    boss->Update();
+			    if (boss->GetIsDead() == true) {
+				    isGameClear_ = true;
+			    }
+		    }
+		    // ボス弾更新
+		    for (BossBullet* bullet : bossBullets_) {
+			    bullet->Update();
+		    }
 	}
 
 	skydome_->Update();
@@ -138,7 +155,7 @@ void GameScene::Update()
 	if (player_->GetIsDead() == true) {
 		isGameOver_ = true;
 	}
-
+	
 }
 
 void GameScene::Draw() {
@@ -182,14 +199,16 @@ void GameScene::Draw() {
 	}
 	skydome_->Draw(viewProjection_);
 
-	for (Boss* boss : boss_) {
-		boss->Draw(viewProjection_);
+	if (bossPopTimer_ <= 0) 
+	{
+		for (Boss* boss : boss_) {
+			    boss->Draw(viewProjection_);
+		}
+		//// ボス弾更新
+		for (BossBullet* bullet : bossBullets_) {
+			    bullet->Draw(viewProjection_);
+		}
 	}
-	//// ボス弾更新
-	for (BossBullet* bullet : bossBullets_) {
-		bullet->Draw(viewProjection_);
-	}
-
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -201,12 +220,56 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
 #pragma endregion
 
+}
+
+void GameScene::TitleDraw()
+{
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+	spriteTitle_->Draw();
+	/// <summary>
+	/// ここに前景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+}
+
+void GameScene::GameOverDraw() 
+{
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+	spriteGameOver_->Draw();
+	/// <summary>
+	/// ここに前景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
+}
+
+void GameScene::GameClearDraw()
+{
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+	spriteGameClear_->Draw();
+	/// <summary>
+	/// ここに前景スプライトの描画処理を追加できる
+	/// </summary>
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
 }
 
 void GameScene::ExplanationUpdate() 

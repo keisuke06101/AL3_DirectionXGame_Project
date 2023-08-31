@@ -38,10 +38,19 @@ void SceneManager::Update()
 		{
 			sceneNo_ = GameOver;
 		}
+		if (gameScene_->GetIsGameClear() == true)
+		{
+			sceneNo_ = GameClear;
+		}
 
 		break;
 	case GameClear:
 		
+		if (input_->PushKey(DIK_BACKSPACE)) {
+			sceneNo_ = Game;
+			Initialize();
+		}
+
 		break;
 	case GameOver:
 		
@@ -61,6 +70,7 @@ void SceneManager::Draw()
 	switch (sceneNo_) {
 	case Title:
 
+		gameScene_->TitleDraw();
 		gameScene_->ExplanationDraw();
 
 		break;
@@ -71,9 +81,10 @@ void SceneManager::Draw()
 		break;
 	case GameClear:
 
+		gameScene_->GameClearDraw();
 		break;
 	case GameOver:
-
+		gameScene_->GameOverDraw();
 		break;
 	default:
 		break;

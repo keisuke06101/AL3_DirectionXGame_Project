@@ -48,7 +48,7 @@ public:
 	/// <summary>
 	/// 離脱フェーズの更新処理
 	/// </summary>
-	void phaseLeave();
+	void phase2();
 
 	/// <summary>
 	/// 弾発射
@@ -73,7 +73,7 @@ public:
 	// const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
 
 	const float GetRadius() { return radius_; }
-	const float radius_ = 0.1f;
+	const float radius_ = 10.0f;
 
 	bool GetIsDead() const { return isDead_; };
 
@@ -103,7 +103,7 @@ private:
 	// 行動フェーズ
 	enum class Phase {
 		Approach, // 接近する
-		Leave     // 離脱する
+		phase2     // 離脱する
 	};
 
 	Phase phase_ = Phase::Approach;
@@ -142,4 +142,6 @@ private:
 	int randY_ = 0;
 	int randZ_ = 0;
 	int i_ = 21;
+
+	int bossLife_ = 35;
 };
